@@ -356,6 +356,7 @@ body {
   display: none;
   z-index: 1006;
   overflow: hidden;
+  flex-direction: column;
 }
 #start-menu-header {
   background: linear-gradient(90deg, #2b71e8 0%, #3a93ff 100%);
@@ -391,7 +392,9 @@ body {
   margin-top: 2px;
 }
 #start-menu-content {
-  display: flex;
+  flex: 1;
+  min-height: 0;
+  overflow: hidden;
   height: calc(100% - 110px);
 }
 #start-menu-left {
@@ -471,27 +474,45 @@ body {
   color: #003;
 }
 #start-menu-footer {
-  background: linear-gradient(180deg, #2b71e8 0%, #2063d0 100%);
-  padding: 8px 10px;
+  background: linear-gradient(180deg, #3a7be8 0%, #1a5cb8 100%);
+  padding: 12px 15px;
   display: flex;
-  justify-content: space-between;
-  border-top: 1px solid #1a5cb8;
+  justify-content: flex-end;
+  gap: 10px;
+  border-top: 2px solid #1a5cb8;
+  flex-shrink: 0;
 }
 .start-menu-footer-btn {
-  background: rgba(255,255,255,0.2);
-  border: 1px solid rgba(255,255,255,0.3);
-  border-radius: 3px;
-  padding: 4px 12px;
+  background: linear-gradient(180deg, #ff6b4a 0%, #d44a2a 100%);
+  border: 1px solid #a03820;
+  border-radius: 4px;
+  padding: 8px 16px;
   color: #fff;
-  font-size: 11px;
+    font-size: 12px;
+  font-weight: bold;
   cursor: pointer;
   display: flex;
   align-items: center;
-  gap: 6px;
-  transition: background 0.1s;
+  gap: 8px;
+  transition: all 0.2s;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3);
 }
 .start-menu-footer-btn:hover {
-  background: rgba(255,255,255,0.3);
+   background: linear-gradient(180deg, #ff8060 0%, #e55a3a 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+.start-menu-footer-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.3);
+}
+#logoff-btn {
+  background: linear-gradient(180deg, #ffa040 0%, #e88020 100%);
+  border-color: #c06010;
+}
+#logoff-btn:hover {
+  background: linear-gradient(180deg, #ffb060 0%, #f09030 100%);
 }
 #taskbar-programs {
   flex: 1;
@@ -2199,7 +2220,7 @@ function removeTaskbarItem(id){
 // Menu démarrer
 document.getElementById('start-btn').addEventListener('click',()=>{
   const menu=document.getElementById('start-menu');
-  menu.style.display=menu.style.display==='none'||!menu.style.display?'block':'none';
+  menu.style.display=menu.style.display==='none'||!menu.style.display?'flex':'none';
 });
 
 document.addEventListener('click',e=>{
