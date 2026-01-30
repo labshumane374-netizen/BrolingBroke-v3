@@ -297,6 +297,18 @@ body {
   background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #922b21 100%);
   border-color: #ec7063;
 }
+.txt-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 50%, #d0d0d0 100%);
+  border-color: #aaa;
+}
+.pdf-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #ff4444 0%, #cc2222 50%, #aa1111 100%);
+  border-color: #ff6666;
+}
+.shortcut-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #5dade2 0%, #3498db 50%, #2980b9 100%);
+  border-color: #85c1e9;
+}
 #taskbar {
   position: fixed;
   bottom: 0;
@@ -1384,6 +1396,30 @@ body {
       <div class="desktop-icon-img">🗑️</div>
       <div class="desktop-icon-label">Corbeille</div>
     </div>
+    <div class="desktop-icon txt-icon" data-file="notes_reunion.txt">
+      <div class="desktop-icon-img">📄</div>
+      <div class="desktop-icon-label">notes_reunion.txt</div>
+    </div>
+    <div class="desktop-icon txt-icon" data-file="planning_semaine.txt">
+      <div class="desktop-icon-img">📄</div>
+      <div class="desktop-icon-label">planning_semaine.txt</div>
+    </div>
+    <div class="desktop-icon txt-icon" data-file="contacts_urgence.txt">
+      <div class="desktop-icon-img">📄</div>
+      <div class="desktop-icon-label">contacts_urgence.txt</div>
+    </div>
+    <div class="desktop-icon pdf-icon" data-file="reglement_interne.pdf">
+      <div class="desktop-icon-img">📕</div>
+      <div class="desktop-icon-label">reglement_interne.pdf</div>
+    </div>
+    <div class="desktop-icon txt-icon" data-file="memo_direction.txt">
+      <div class="desktop-icon-img">📄</div>
+      <div class="desktop-icon-label">memo_direction.txt</div>
+    </div>
+    <div class="desktop-icon shortcut-icon" data-file="rapport_mensuel">
+      <div class="desktop-icon-img">📊</div>
+      <div class="desktop-icon-label">Rapport<br>mensuel</div>
+    </div>
   </div>
 </div>
 
@@ -2281,11 +2317,155 @@ document.getElementById('main-volume-slider').addEventListener('input',e=>{
 // Horloge cliquable
 document.getElementById('clock').addEventListener('click',()=>openCalendar());
 
+// Contenus des fichiers du bureau
+const desktopFiles={
+  'notes_reunion.txt': `RÉUNION DU 15/01/2026 - SÉCURITÉ PÉNITENTIAIRE
+=============================================
+
+Présents: Dir. Martinez, Adj. Dubois, Chef Moreau
+
+Points abordés:
+- Révision des protocoles d'évacuation
+- Formation du nouveau personnel (session prévue 22/01)
+- Mise à jour du système de badges
+- Incident du bloc B réglé
+
+À FAIRE:
+[ ] Commander nouveau matériel de surveillance
+[ ] Planifier inspection mensuelle
+[ ] Valider les congés de février
+
+Prochaine réunion: 29/01/2026 - 14h00`,
+
+  'planning_semaine.txt': `PLANNING SEMAINE 05 - 2026
+===========================
+
+LUNDI 27/01
+  08:00 - Briefing équipe
+  10:00 - Visite cellules bloc A
+  14:00 - Formation sécurité incendie
+
+MARDI 28/01
+  09:00 - Réunion administrative
+  11:00 - Contrôle inventaire
+  15:00 - Entretien nouveau détenu #4521
+
+MERCREDI 29/01
+  08:30 - Inspection cuisine
+  14:00 - Réunion direction (salle B)
+
+JEUDI 30/01
+  10:00 - Audit externe
+  14:00 - Mise à jour dossiers
+
+VENDREDI 31/01
+  09:00 - Débriefing semaine
+  12:00 - Fin de service`,
+
+  'contacts_urgence.txt': `CONTACTS D'URGENCE - ÉTABLISSEMENT BROLINGBOKE
+==============================================
+
+DIRECTION
+  Dir. Martinez ........... Poste 101
+  Adj. Dubois ............. Poste 102
+  Secrétariat ............. Poste 100
+
+SÉCURITÉ
+  PC Sécurité ............. Poste 911
+  Chef de ronde ........... Poste 150
+  Armurerie ............... Poste 155
+
+MÉDICAL
+  Infirmerie .............. Poste 200
+  Dr. Lambert ............. Poste 201
+  Urgences ext. ........... 15 ou 112
+
+MAINTENANCE
+  Service technique ....... Poste 300
+  Électricité ............. Poste 301
+  Plomberie ............... Poste 302
+
+EXTERNE
+  Gendarmerie ............. 17
+  SAMU .................... 15
+  Pompiers ................ 18`,
+
+  'memo_direction.txt': `MÉMO INTERNE - CONFIDENTIEL
+============================
+De: Direction générale
+À: Tous les agents
+Date: 20/01/2026
+
+Objet: Nouvelles procédures de sécurité
+
+Suite aux récents événements, nous rappelons à
+l'ensemble du personnel les points suivants:
+
+1. Port du badge obligatoire en toutes circonstances
+2. Vérification systématique des accès
+3. Signalement immédiat de tout comportement suspect
+4. Interdiction des téléphones personnels en zone détention
+
+Le non-respect de ces consignes pourra entraîner
+des sanctions disciplinaires.
+
+La Direction`,
+
+  'reglement_interne.pdf': `[Document PDF - Règlement intérieur]
+
+Ce fichier nécessite Adobe Reader pour être ouvert.
+
+Résumé du contenu:
+- Chapitre 1: Dispositions générales
+- Chapitre 2: Droits et devoirs du personnel
+- Chapitre 3: Procédures de sécurité
+- Chapitre 4: Gestion des détenus
+- Chapitre 5: Sanctions disciplinaires
+
+Document mis à jour le 01/01/2026
+Version 3.2`,
+
+  'rapport_mensuel': `RAPPORT MENSUEL - DÉCEMBRE 2025
+================================
+
+STATISTIQUES GÉNÉRALES
+  Population carcérale: 847 détenus
+  Capacité: 900 places
+  Taux d'occupation: 94.1%
+
+INCIDENTS
+  Altercations mineures: 12
+  Tentatives d'évasion: 0
+  Infractions disciplinaires: 34
+
+PERSONNEL
+  Effectif total: 156 agents
+  Arrêts maladie: 8
+  Formations suivies: 23
+
+OBSERVATIONS
+  Mois relativement calme. Légère
+  augmentation des tensions au bloc C
+  suite aux travaux de rénovation.
+
+  Rapport complet disponible sur demande.`
+};
+
 // Bureau
 document.getElementById('computer-icon').addEventListener('click',()=>openExplorer('computer'));
 document.getElementById('doc-icon').addEventListener('click',openDocApp);
 document.getElementById('documents-icon').addEventListener('click',()=>openExplorer('documents'));
 document.getElementById('email-icon').addEventListener('click',openEmail);
+
+// Fichiers du bureau
+document.querySelectorAll('.desktop-icon[data-file]').forEach(icon=>{
+  icon.addEventListener('dblclick',()=>{
+    const filename=icon.dataset.file;
+    if(desktopFiles[filename]){
+      openNotepad(filename,desktopFiles[filename]);
+    }
+  });
+});
 
 // Explorateur
 document.getElementById('explorer-close-btn').addEventListener('click',()=>{
