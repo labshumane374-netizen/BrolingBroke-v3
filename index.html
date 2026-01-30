@@ -362,8 +362,8 @@ body {
   position: fixed;
   bottom: 30px;
   left: 0;
-  width: 380px;
-  height: 500px;
+  width: 420px;
+  height: 480px;
   background: linear-gradient(180deg, #fff 0%, #f8f6f0 100%);
   border: 1px solid #0054e3;
   border-radius: 6px 6px 0 0;
@@ -408,22 +408,24 @@ body {
 }
 #start-menu-content {
   display: flex;
+  flex-direction: row;
   flex: 1;
   min-height: 0;
   overflow: hidden;
 }
 #start-menu-left {
-  width: 60%;
+  flex: 0 0 60%;
   background: #fff;
   border-right: 1px solid #ddd;
   overflow-y: auto;
 }
 #start-menu-right {
-  width: 40%;
+  flex: 0 0 40%;
   background: linear-gradient(180deg, #d0e8ff 0%, #b8d8f0 100%);
   padding: 5px;
   overflow-y: auto;
   overflow-x: hidden;
+  box-sizing: border-box;
 }
 .start-menu-item {
   padding: 8px 15px;
