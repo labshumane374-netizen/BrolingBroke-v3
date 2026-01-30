@@ -1,0 +1,2563 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brolingboke D.O.C. - GrandLine XP</title>
+<style>
+:root {
+  --xp-window-bg: #ece9d8;
+  --xp-input-border: #7f9db9;
+  --xp-selection: #316ac5;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: 'Tahoma', 'Segoe UI', sans-serif;
+  overflow: hidden;
+  height: 100vh;
+  cursor: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="12" height="19"><path fill="white" stroke="black" d="M0,0 L0,16 L4,12 L7,18 L9,17 L6,11 L11,11 Z"/></svg>') 0 0, auto;
+}
+#bios {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  color: #aaaaaa;
+  font-family: 'Consolas', 'Courier New', monospace;
+  font-size: 14px;
+  padding: 20px;
+  z-index: 1004;
+  display: flex;
+  flex-direction: column;
+  line-height: 1.4;
+}
+#bios-header {
+  background: #0000aa;
+  color: #ffff00;
+  padding: 5px 10px;
+  margin: -20px -20px 15px -20px;
+  text-align: center;
+  font-weight: bold;
+  letter-spacing: 2px;
+}
+#bios-text { white-space: pre; flex: 1; }
+#bios-text .highlight { color: #ffffff; }
+#bios-text .success { color: #00aa00; }
+#bios-text .value { color: #00aaaa; }
+#bios-prompt {
+  color: #ffffff;
+  background: #000;
+  margin-top: 20px;
+  animation: blink-cursor 1s infinite;
+  padding: 5px;
+  border: 1px solid #333;
+}
+#bios-footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid #333;
+  color: #666;
+  font-size: 12px;
+}
+@keyframes blink-cursor {
+  0%, 50% { border-left: 2px solid #aaa; }
+  51%, 100% { border-left: 2px solid transparent; }
+}
+#boot {
+  position: fixed;
+  inset: 0;
+  background: #000;
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1003;
+}
+#boot-logo {
+  width: 150px;
+  height: 150px;
+  animation: logo-pulse 2s ease-in-out infinite;
+}
+@keyframes logo-pulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+#boot-text {
+  color: #fff;
+  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', sans-serif;
+  font-size: 28px;
+  margin-top: 25px;
+  letter-spacing: 1px;
+}
+#boot-dots { display: flex; gap: 8px; margin-top: 30px; }
+#boot-dots span {
+  width: 12px;
+  height: 12px;
+  background: #0078d4;
+  border-radius: 50%;
+  animation: boot-dot 1.4s ease-in-out infinite;
+}
+#boot-dots span:nth-child(1) { animation-delay: 0s; }
+#boot-dots span:nth-child(2) { animation-delay: 0.2s; }
+#boot-dots span:nth-child(3) { animation-delay: 0.4s; }
+@keyframes boot-dot {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+#startup {
+  position: fixed;
+  inset: 0;
+  background: linear-gradient(180deg, #000 0%, #002266 30%, #003399 60%, #000 100%);
+  display: none;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  z-index: 1002;
+  overflow: hidden;
+}
+#startup::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at center bottom, rgba(0,100,200,0.3) 0%, transparent 70%);
+}
+#startup-logo-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  margin-bottom: 60px;
+  z-index: 1;
+}
+#startup-logo-img {
+  width: 120px;
+  height: 120px;
+  animation: startup-logo-anim 3s ease-in-out infinite;
+}
+@keyframes startup-logo-anim {
+  0%, 100% { transform: scale(1) rotate(0deg); }
+  50% { transform: scale(1.02) rotate(2deg); }
+}
+#startup-logo {
+  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', sans-serif;
+  font-size: 52px;
+  color: #fff;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 0 0 40px rgba(100,150,255,0.5);
+  font-weight: normal;
+  font-style: italic;
+  letter-spacing: -1px;
+}
+#startup-logo span { font-weight: bold; font-style: normal; }
+#startup-bar-container { width: 220px; z-index: 1; }
+#startup-bar {
+  height: 16px;
+  background: #1a1a2e;
+  border: 1px solid #333;
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+}
+#startup-progress {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  bottom: 2px;
+  width: 0%;
+  background: linear-gradient(180deg, #6eb7ff 0%, #0066cc 50%, #004499 100%);
+  border-radius: 6px;
+  transition: width 0.1s;
+}
+#startup-text {
+  color: #fff;
+  font-size: 11px;
+  margin-top: 15px;
+  z-index: 1;
+  font-family: 'Tahoma', sans-serif;
+}
+#desktop {
+  position: fixed;
+  inset: 0;
+  background: #245edb;
+  display: none;
+  z-index: 1001;
+}
+#desktop-wallpaper {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(135deg, transparent 25%, rgba(255,255,255,0.03) 25%, rgba(255,255,255,0.03) 50%, transparent 50%, transparent 75%, rgba(255,255,255,0.03) 75%),
+    linear-gradient(45deg, #1a4a9e 0%, #2563c9 50%, #5890d8 100%);
+  background-size: 60px 60px, 100% 100%;
+  background-position: 0 0, center;
+}
+#desktop-wallpaper::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  font-size: 180px;
+  opacity: 0.08;
+  font-weight: bold;
+  color: #fff;
+  text-shadow: 0 0 40px rgba(255,255,255,0.3);
+  content: '🏛️';
+  animation: wallpaper-pulse 8s ease-in-out infinite;
+}
+@keyframes wallpaper-pulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); }
+  50% { transform: translate(-50%, -50%) scale(1.05); }
+}
+#desktop-wallpaper::after {
+  content: 'BROLINGBOKE D.O.C.';
+  position: absolute;
+  bottom: 40px;
+  right: 40px;
+  font-size: 14px;
+  color: rgba(255,255,255,0.4);
+  font-weight: bold;
+  letter-spacing: 2px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+#desktop-icons {
+  padding: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  position: relative;
+  z-index: 1;
+}
+.desktop-icon {
+  width: 75px;
+  text-align: center;
+  cursor: pointer;
+  padding: 5px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  transition: all 0.1s;
+}
+.desktop-icon:hover {
+  background: rgba(80, 140, 220, 0.4);
+  border-color: rgba(100, 160, 240, 0.6);
+}
+.desktop-icon:active, .desktop-icon.selected {
+  background: rgba(60, 120, 200, 0.6);
+  border-color: rgba(80, 140, 220, 0.8);
+}
+.desktop-icon-img {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 4px;
+  background: linear-gradient(135deg, #1a5cb8 0%, #2d7dd9 50%, #1a5cb8 100%);
+  border: 2px solid rgba(255,255,255,0.8);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 26px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 2px 4px rgba(0,0,0,0.3), 0 4px 8px rgba(0,0,0,0.2);
+  position: relative;
+  overflow: hidden;
+}
+.desktop-icon-img::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255,255,255,0.3) 0%, transparent 100%);
+  border-radius: 4px 4px 0 0;
+}
+.desktop-icon-label {
+  color: #fff;
+  font-size: 11px;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.9), 0 0 3px rgba(0,0,0,0.5);
+  line-height: 1.3;
+  word-wrap: break-word;
+}
+.folder-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #ffcc66 0%, #ffaa00 50%, #cc8800 100%);
+  border-color: #996600;
+}
+.computer-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #5a5a5a 0%, #3a3a3a 50%, #2a2a2a 100%);
+  border-color: #888;
+}
+.recycle-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #4a90c4 0%, #2a6a94 50%, #1a5074 100%);
+  border-color: #6ab0e4;
+}
+.game-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #9b59b6 0%, #8e44ad 50%, #6c3483 100%);
+  border-color: #c39bd3;
+}
+.email-icon .desktop-icon-img {
+  background: linear-gradient(135deg, #e74c3c 0%, #c0392b 50%, #922b21 100%);
+  border-color: #ec7063;
+}
+#taskbar {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 30px;
+  background: linear-gradient(180deg, #3168d5 0%, #4993e6 3%, #2157d0 4%, #2663e0 10%, #1c4cc4 90%, #1941a5 96%, #1941a5 100%);
+  border-top: 1px solid #0d3ba8;
+  display: none;
+  align-items: center;
+  padding: 0 2px;
+  z-index: 1005;
+}
+#start-btn {
+  height: 24px;
+  background: linear-gradient(180deg, #3c9a41 0%, #52b858 8%, #3c9a41 18%, #368f39 92%, #276d2a 100%);
+  border: none;
+  border-radius: 0 8px 8px 0;
+  padding: 0 12px 0 6px;
+  color: #fff;
+  font-family: 'Franklin Gothic Medium', 'Trebuchet MS', sans-serif;
+  font-size: 13px;
+  font-weight: bold;
+  font-style: italic;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 1px 2px rgba(0,0,0,0.3);
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+  transition: filter 0.1s;
+}
+#start-btn:hover { filter: brightness(1.1); }
+#start-btn:active { filter: brightness(0.95); box-shadow: inset 0 1px 3px rgba(0,0,0,0.3); }
+.start-orb {
+  width: 18px;
+  height: 18px;
+  background: linear-gradient(135deg, #5fd865 0%, #2a8f2f 50%, #1a6d1f 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-style: normal;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.3), inset 0 2px 4px rgba(255,255,255,0.3);
+}
+#start-menu {
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  width: 380px;
+  height: 500px;
+  background: linear-gradient(180deg, #fff 0%, #f8f6f0 100%);
+  border: 1px solid #0054e3;
+  border-radius: 6px 6px 0 0;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.4);
+  display: none;
+  z-index: 1006;
+  overflow: hidden;
+}
+#start-menu-header {
+  background: linear-gradient(90deg, #2b71e8 0%, #3a93ff 100%);
+  padding: 20px;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  border-bottom: 2px solid #1a5cb8;
+}
+#start-menu-avatar {
+  width: 48px;
+  height: 48px;
+  background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 28px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+#start-menu-user {
+  flex: 1;
+}
+#start-menu-user-name {
+  font-size: 16px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.3);
+}
+#start-menu-user-role {
+  font-size: 11px;
+  opacity: 0.9;
+  margin-top: 2px;
+}
+#start-menu-content {
+  display: flex;
+  height: calc(100% - 110px);
+}
+#start-menu-left {
+  width: 60%;
+  background: #fff;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+#start-menu-right {
+  width: 40%;
+  background: linear-gradient(180deg, #d0e8ff 0%, #b8d8f0 100%);
+  padding: 10px;
+}
+.start-menu-item {
+  padding: 8px 15px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  transition: background 0.1s;
+  border-left: 3px solid transparent;
+}
+.start-menu-item:hover {
+  background: linear-gradient(90deg, #e8f4ff 0%, #d0e8ff 100%);
+  border-left-color: #316ac5;
+}
+.start-menu-item-icon {
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+}
+.start-menu-item-text {
+  flex: 1;
+}
+.start-menu-item-name {
+  font-size: 12px;
+  font-weight: bold;
+  color: #000;
+}
+.start-menu-item-desc {
+  font-size: 10px;
+  color: #666;
+  margin-top: 2px;
+}
+.start-menu-section {
+  margin-bottom: 8px;
+}
+.start-menu-section-title {
+  font-size: 10px;
+  color: #666;
+  padding: 8px 10px 4px;
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.start-menu-shortcut {
+  padding: 6px 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  transition: background 0.1s;
+  margin-bottom: 2px;
+}
+.start-menu-shortcut:hover {
+  background: rgba(255,255,255,0.5);
+}
+.start-menu-shortcut-icon {
+  font-size: 16px;
+}
+.start-menu-shortcut-text {
+  font-size: 11px;
+  color: #003;
+}
+#start-menu-footer {
+  background: linear-gradient(180deg, #2b71e8 0%, #2063d0 100%);
+  padding: 8px 10px;
+  display: flex;
+  justify-content: space-between;
+  border-top: 1px solid #1a5cb8;
+}
+.start-menu-footer-btn {
+  background: rgba(255,255,255,0.2);
+  border: 1px solid rgba(255,255,255,0.3);
+  border-radius: 3px;
+  padding: 4px 12px;
+  color: #fff;
+  font-size: 11px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.1s;
+}
+.start-menu-footer-btn:hover {
+  background: rgba(255,255,255,0.3);
+}
+#taskbar-programs {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  padding: 0 5px;
+  gap: 3px;
+  height: 100%;
+}
+.taskbar-item {
+  height: 22px;
+  min-width: 140px;
+  max-width: 180px;
+  background: linear-gradient(180deg, #3c89d0 0%, #2a6cb8 40%, #2462aa 60%, #1d58a0 100%);
+  border: 1px solid;
+  border-color: #4a9ee8 #1a4a8a #1a4a8a #4a9ee8;
+  border-radius: 2px;
+  padding: 0 8px;
+  color: #fff;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: pointer;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.4);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,0.2);
+}
+.taskbar-item:hover { background: linear-gradient(180deg, #4a9ee8 0%, #3a89d0 40%, #3080c8 60%, #2870b8 100%); }
+.taskbar-item.active {
+  background: linear-gradient(180deg, #1e5090 0%, #1a4580 40%, #164078 60%, #123870 100%);
+  border-color: #1a4a8a #4a9ee8 #4a9ee8 #1a4a8a;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.3);
+}
+.taskbar-item-icon { width: 16px; height: 16px; display: flex; align-items: center; justify-content: center; font-size: 12px; }
+.taskbar-item-text { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#system-tray {
+  height: 100%;
+  background: linear-gradient(180deg, #1a8cde 0%, #1670c4 50%, #1060b0 100%);
+  border-left: 1px solid #0d3ba8;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.tray-icon { 
+  font-size: 12px; 
+  opacity: 0.9; 
+  cursor: pointer;
+  position: relative;
+}
+.tray-icon:hover { opacity: 1; }
+#clock { 
+  color: #fff; 
+  font-size: 11px; 
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.3); 
+  font-family: 'Tahoma', sans-serif;
+  cursor: pointer;
+}
+#volume-popup {
+  position: fixed;
+  bottom: 35px;
+  right: 10px;
+  width: 50px;
+  height: 150px;
+  background: var(--xp-window-bg);
+  border: 1px solid #0054e3;
+  border-radius: 6px;
+  box-shadow: 2px 2px 8px rgba(0,0,0,0.3);
+  padding: 10px;
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  z-index: 1007;
+}
+#volume-slider {
+  writing-mode: bt-lr;
+  -webkit-appearance: slider-vertical;
+  width: 8px;
+  height: 100px;
+  flex: 1;
+}
+#notification-area {
+  position: fixed;
+  bottom: 40px;
+  right: 10px;
+  width: 300px;
+  z-index: 1008;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.notification {
+  background: linear-gradient(180deg, #fff 0%, #f8f6f0 100%);
+  border: 1px solid #0054e3;
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+  animation: notification-slide 0.3s ease-out;
+  display: flex;
+  gap: 10px;
+  cursor: pointer;
+}
+@keyframes notification-slide {
+  from {
+    transform: translateX(320px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+.notification-icon {
+  font-size: 24px;
+}
+.notification-content {
+  flex: 1;
+}
+.notification-title {
+  font-size: 12px;
+  font-weight: bold;
+  color: #003399;
+  margin-bottom: 4px;
+}
+.notification-text {
+  font-size: 11px;
+  color: #333;
+  line-height: 1.4;
+}
+.notification-close {
+  font-size: 16px;
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.1s;
+}
+.notification-close:hover {
+  opacity: 1;
+}
+
+/* Continue dans la partie 2... *//* Suite des styles depuis la partie 1 */
+
+.window {
+  background: var(--xp-window-bg);
+  border: 1px solid #0054e3;
+  border-radius: 8px 8px 0 0;
+  box-shadow: 0 0 0 1px #0054e3, 2px 2px 10px rgba(0,0,0,0.4), inset 0 0 0 1px rgba(255,255,255,0.1);
+  width: 95%;
+  max-width: 950px;
+  height: 92vh;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  display: none;
+  z-index: 1010;
+}
+.explorer-window {
+  width: 750px;
+  height: 550px;
+  max-width: 750px;
+  z-index: 1011;
+}
+.game-window {
+  width: 400px;
+  height: 450px;
+  max-width: 400px;
+  z-index: 1012;
+}
+.email-window {
+  width: 700px;
+  height: 550px;
+  max-width: 700px;
+  z-index: 1013;
+}
+.settings-window {
+  width: 600px;
+  height: 500px;
+  max-width: 600px;
+  z-index: 1014;
+}
+.calendar-window {
+  width: 450px;
+  height: 400px;
+  max-width: 450px;
+  z-index: 1015;
+}
+.title-bar {
+  height: 30px;
+  background: linear-gradient(180deg, #0058ee 0%, #3a93ff 8%, #2b7fff 15%, #1872eb 85%, #0855dd 92%, #0044bb 100%);
+  border-radius: 6px 6px 0 0;
+  padding: 0 4px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  cursor: default;
+}
+.title-bar-icon { width: 18px; height: 18px; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.title-bar-text {
+  flex: 1;
+  color: #fff;
+  font-size: 13px;
+  font-weight: bold;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.title-bar-buttons { display: flex; gap: 2px; }
+.title-bar-button {
+  width: 21px;
+  height: 21px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 9px;
+  font-weight: bold;
+  transition: filter 0.1s;
+}
+.btn-minimize { background: linear-gradient(180deg, #3dc2ff 0%, #1ca8e8 50%, #0d98d8 100%); color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
+.btn-maximize { background: linear-gradient(180deg, #3dc2ff 0%, #1ca8e8 50%, #0d98d8 100%); color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
+.btn-close { background: linear-gradient(180deg, #f8a882 0%, #e87751 50%, #d85538 100%); color: #fff; text-shadow: 1px 1px 0 rgba(0,0,0,0.3); }
+.title-bar-button:hover { filter: brightness(1.2); }
+.title-bar-button:active { filter: brightness(0.9); }
+.window-content { height: calc(100% - 30px); overflow: auto; background: var(--xp-window-bg); border-top: 1px solid rgba(255,255,255,0.5); }
+.explorer-toolbar {
+  background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%);
+  border-bottom: 1px solid #aca899;
+  padding: 5px 8px;
+  display: flex;
+  gap: 5px;
+  align-items: center;
+}
+.toolbar-btn {
+  background: linear-gradient(180deg, #fff 0%, #f5f4ea 45%, #dedad2 55%, #d2cec6 100%);
+  border: 1px solid;
+  border-color: #8e8f8f #5d6069 #5d6069 #8e8f8f;
+  border-radius: 3px;
+  padding: 3px 8px;
+  font: 11px 'Tahoma', sans-serif;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.toolbar-btn:hover { background: linear-gradient(180deg, #fff 0%, #fff7e6 45%, #f0e8d8 55%, #e8e0d0 100%); border-color: #316ac5; }
+.toolbar-btn:active { background: linear-gradient(180deg, #d8d4cc 0%, #e8e4dc 100%); }
+.toolbar-btn:disabled { opacity: 0.5; cursor: not-allowed; }
+.address-bar-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #fff;
+  border: 1px solid #7f9db9;
+  padding: 2px 5px;
+}
+.address-bar-label { font-size: 11px; color: #666; }
+.address-bar {
+  flex: 1;
+  border: none;
+  font: 11px 'Tahoma', sans-serif;
+  outline: none;
+}
+.explorer-content {
+  display: flex;
+  height: calc(100% - 80px);
+}
+.explorer-sidebar {
+  width: 180px;
+  background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%);
+  border-right: 1px solid #aca899;
+  padding: 10px;
+}
+.sidebar-section {
+  margin-bottom: 15px;
+}
+.sidebar-title {
+  font-size: 11px;
+  font-weight: bold;
+  color: #003399;
+  margin-bottom: 5px;
+}
+.sidebar-item {
+  padding: 4px 8px;
+  font-size: 11px;
+  cursor: pointer;
+  border-radius: 2px;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: background 0.1s;
+}
+.sidebar-item:hover {
+  background: rgba(49,106,197,0.1);
+}
+.sidebar-item.active {
+  background: #316ac5;
+  color: #fff;
+}
+.explorer-main {
+  flex: 1;
+  background: #fff;
+  padding: 15px;
+  overflow-y: auto;
+}
+.file-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
+  gap: 15px;
+}
+.file-item {
+  text-align: center;
+  cursor: pointer;
+  padding: 8px;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  transition: all 0.1s;
+}
+.file-item:hover {
+  background: rgba(49,106,197,0.1);
+  border-color: rgba(49,106,197,0.3);
+}
+.file-item.selected {
+  background: rgba(49,106,197,0.2);
+  border-color: #316ac5;
+}
+.file-icon {
+  width: 48px;
+  height: 48px;
+  margin: 0 auto 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 32px;
+}
+.file-name {
+  font-size: 11px;
+  color: #000;
+  word-wrap: break-word;
+  line-height: 1.3;
+}
+.notepad-window {
+  width: 600px;
+  height: 450px;
+  max-width: 600px;
+  z-index: 1016;
+}
+.notepad-window .window-content {
+  background: #fff;
+  padding: 0;
+}
+.notepad-textarea {
+  width: 100%;
+  height: 100%;
+  border: none;
+  resize: none;
+  font-family: 'Lucida Console', 'Courier New', monospace;
+  font-size: 12px;
+  line-height: 1.4;
+  outline: none;
+  padding: 8px;
+}
+.explorer-statusbar {
+  background: var(--xp-window-bg);
+  border-top: 1px solid #aca899;
+  padding: 3px 8px;
+  font-size: 11px;
+  color: #333;
+  display: flex;
+  gap: 20px;
+}
+.game-content {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  height: 100%;
+  background: #fff;
+}
+.minesweeper-grid {
+  display: grid;
+  gap: 1px;
+  background: #999;
+  border: 3px solid;
+  border-color: #fff #7b7b7b #7b7b7b #fff;
+  padding: 3px;
+}
+.mine-cell {
+  width: 25px;
+  height: 25px;
+  background: linear-gradient(135deg, #e0e0e0 0%, #c0c0c0 100%);
+  border: 2px solid;
+  border-color: #fff #7b7b7b #7b7b7b #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: bold;
+  cursor: pointer;
+  user-select: none;
+}
+.mine-cell:active {
+  border-color: #7b7b7b #fff #fff #7b7b7b;
+}
+.mine-cell.revealed {
+  background: #c0c0c0;
+  border: 1px solid #7b7b7b;
+}
+.mine-cell.flagged::after {
+  content: '🚩';
+  font-size: 14px;
+}
+.mine-cell.mine::after {
+  content: '💣';
+  font-size: 14px;
+}
+.game-info {
+  display: flex;
+  gap: 30px;
+  font-size: 13px;
+  font-weight: bold;
+}
+.email-content {
+  display: flex;
+  height: 100%;
+  background: #fff;
+}
+.email-sidebar {
+  width: 200px;
+  background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%);
+  border-right: 1px solid #aca899;
+  padding: 10px;
+}
+.email-folder {
+  padding: 8px;
+  cursor: pointer;
+  border-radius: 3px;
+  font-size: 11px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 4px;
+  transition: background 0.1s;
+}
+.email-folder:hover {
+  background: rgba(49,106,197,0.1);
+}
+.email-folder.active {
+  background: #316ac5;
+  color: #fff;
+}
+.email-list {
+  flex: 1;
+  border-right: 1px solid #ddd;
+  overflow-y: auto;
+}
+.email-item {
+  padding: 12px;
+  border-bottom: 1px solid #ddd;
+  cursor: pointer;
+  transition: background 0.1s;
+}
+.email-item:hover {
+  background: #f0f8ff;
+}
+.email-item.unread {
+  background: #fff8e6;
+  font-weight: bold;
+}
+.email-item-from {
+  font-size: 12px;
+  font-weight: bold;
+  color: #003399;
+  margin-bottom: 4px;
+}
+.email-item-subject {
+  font-size: 11px;
+  color: #000;
+  margin-bottom: 4px;
+}
+.email-item-preview {
+  font-size: 10px;
+  color: #666;
+}
+.email-preview {
+  flex: 2;
+  padding: 20px;
+  overflow-y: auto;
+}
+.email-preview-header {
+  border-bottom: 2px solid #ddd;
+  padding-bottom: 15px;
+  margin-bottom: 15px;
+}
+.email-preview-from {
+  font-size: 13px;
+  font-weight: bold;
+  color: #003399;
+  margin-bottom: 8px;
+}
+.email-preview-subject {
+  font-size: 15px;
+  font-weight: bold;
+  margin-bottom: 8px;
+}
+.email-preview-date {
+  font-size: 11px;
+  color: #666;
+}
+.email-preview-body {
+  font-size: 12px;
+  line-height: 1.6;
+  white-space: pre-wrap;
+}
+.settings-content {
+  padding: 20px;
+  background: #fff;
+  height: 100%;
+  overflow-y: auto;
+}
+.settings-section {
+  margin-bottom: 25px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #ddd;
+}
+.settings-section:last-child {
+  border-bottom: none;
+}
+.settings-title {
+  font-size: 14px;
+  font-weight: bold;
+  color: #003399;
+  margin-bottom: 15px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.settings-option {
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.settings-option-label {
+  font-size: 12px;
+  color: #333;
+}
+.settings-option-control {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+.calendar-content {
+  padding: 15px;
+  background: #fff;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.calendar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+  padding-bottom: 10px;
+  border-bottom: 2px solid #ddd;
+}
+.calendar-month {
+  font-size: 16px;
+  font-weight: bold;
+  color: #003399;
+}
+.calendar-nav {
+  display: flex;
+  gap: 10px;
+}
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 2px;
+  flex: 1;
+}
+.calendar-day-header {
+  text-align: center;
+  font-size: 11px;
+  font-weight: bold;
+  padding: 8px;
+  background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%);
+  color: #003399;
+}
+.calendar-day {
+  border: 1px solid #ddd;
+  padding: 8px;
+  min-height: 40px;
+  cursor: pointer;
+  transition: background 0.1s;
+  font-size: 11px;
+}
+.calendar-day:hover {
+  background: #f0f8ff;
+}
+.calendar-day.today {
+  background: #e6f3ff;
+  border-color: #316ac5;
+  font-weight: bold;
+}
+.calendar-day.other-month {
+  color: #999;
+  background: #f9f9f9;
+}
+.xp-button {
+  background: linear-gradient(180deg, #fff 0%, #f5f4ea 45%, #dedad2 55%, #d2cec6 100%);
+  border: 1px solid;
+  border-color: #8e8f8f #5d6069 #5d6069 #8e8f8f;
+  border-radius: 3px;
+  padding: 4px 16px;
+  font: 11px 'Tahoma', sans-serif;
+  cursor: pointer;
+  box-shadow: inset 0 1px 0 #fff, 0 1px 2px rgba(0,0,0,0.1);
+  color: #000;
+  transition: all 0.1s;
+}
+.xp-button:hover { background: linear-gradient(180deg, #fff 0%, #fff7e6 45%, #f0e8d8 55%, #e8e0d0 100%); border-color: #316ac5; }
+.xp-button:active { background: linear-gradient(180deg, #d8d4cc 0%, #e8e4dc 100%); border-color: #5d6069 #8e8f8f #8e8f8f #5d6069; box-shadow: inset 0 1px 2px rgba(0,0,0,0.2); }
+.xp-button-primary { background: linear-gradient(180deg, #fff 0%, #e6f0ff 45%, #c0d8ff 55%, #a8c8ff 100%); border-color: #003c74; }
+.xp-button-danger { background: linear-gradient(180deg, #fff 0%, #ffe6e6 45%, #ffcccc 55%, #ffb8b8 100%); border-color: #8b0000; color: #8b0000; }
+.xp-input {
+  background: #fff;
+  border: 1px solid var(--xp-input-border);
+  padding: 4px 6px;
+  font: 11px 'Tahoma', sans-serif;
+  width: 100%;
+  box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1);
+}
+.xp-input:focus { outline: none; border-color: #316ac5; box-shadow: inset 1px 1px 2px rgba(0,0,0,0.1), 0 0 0 1px rgba(49,106,197,0.3); }
+.xp-label { font: 11px 'Tahoma', sans-serif; color: #000; margin-bottom: 3px; display: block; }
+.xp-checkbox { accent-color: var(--xp-selection); }
+.xp-select {
+  background: #fff;
+  border: 1px solid var(--xp-input-border);
+  padding: 4px 6px;
+  font: 11px 'Tahoma', sans-serif;
+  cursor: pointer;
+}
+.login-view { display: flex; justify-content: center; align-items: center; height: 100%; background: linear-gradient(180deg, #e8e4dc 0%, #d8d4cc 100%); }
+.login-box {
+  width: 340px;
+  background: linear-gradient(180deg, #fff 0%, #f8f6f0 100%);
+  border: 2px solid;
+  border-color: #fff #aca899 #aca899 #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  overflow: hidden;
+}
+.login-header {
+  background: linear-gradient(180deg, #2b71e8 0%, #2063d0 100%);
+  padding: 15px 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.login-header-icon {
+  width: 40px;
+  height: 40px;
+  background: linear-gradient(135deg, #fff 0%, #e0e0e0 100%);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 22px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+.login-header-text { color: #fff; font-size: 16px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+.login-body { padding: 25px; }
+.login-field { margin-bottom: 15px; }
+.login-field .xp-label { margin-bottom: 5px; font-weight: bold; }
+.login-actions { margin-top: 20px; display: flex; justify-content: flex-end; gap: 10px; }
+.login-error { background: #ffe6e6; border: 1px solid #cc0000; color: #cc0000; padding: 10px 12px; border-radius: 4px; font-size: 11px; margin-bottom: 15px; display: none; }
+.main-header {
+  background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%);
+  border-bottom: 1px solid #aca899;
+  padding: 10px 15px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+.main-header h1 { font-size: 18px; color: #003399; font-weight: bold; display: flex; align-items: center; gap: 8px; }
+.main-header h1::before { content: '📋'; font-size: 20px; }
+.main-toolbar { background: var(--xp-window-bg); border-bottom: 1px solid #aca899; padding: 8px 15px; display: flex; gap: 10px; align-items: center; }
+.search-container { flex: 1; max-width: 400px; position: relative; }
+.search-container::before { content: '🔍'; position: absolute; left: 8px; top: 50%; transform: translateY(-50%); font-size: 12px; opacity: 0.5; }
+.search-container .xp-input { padding-left: 28px; }
+.main-content { padding: 15px; height: calc(100% - 95px); overflow-y: auto; background: #fff; }
+#inmates-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; }
+.inmate-card {
+  background: linear-gradient(180deg, #fff 0%, #f8f6f0 100%);
+  border: 1px solid #aca899;
+  border-radius: 4px;
+  padding: 12px;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+.inmate-card:hover { background: linear-gradient(180deg, #e8f4ff 0%, #d0e8ff 100%); border-color: #316ac5; box-shadow: 0 2px 6px rgba(49,106,197,0.3); transform: translateY(-1px); }
+.inmate-card-header { display: flex; align-items: flex-start; gap: 10px; margin-bottom: 10px; }
+.inmate-avatar {
+  width: 42px;
+  height: 42px;
+  background: linear-gradient(135deg, #667788 0%, #4a5566 100%);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 20px;
+  color: #fff;
+  box-shadow: inset 0 -2px 4px rgba(0,0,0,0.2);
+}
+.inmate-info { flex: 1; }
+.inmate-name { font-size: 13px; font-weight: bold; color: #003399; margin-bottom: 2px; }
+.inmate-alias { font-size: 11px; color: #666; font-style: italic; }
+.inmate-meta { display: flex; gap: 15px; font-size: 11px; color: #555; padding-top: 8px; border-top: 1px solid #e0dcd4; }
+.inmate-meta-item { display: flex; align-items: center; gap: 4px; }
+.inmate-meta-item::before { font-size: 10px; }
+.meta-block::before { content: '🏢'; }
+.meta-cell::before { content: '🚪'; }
+.meta-sentence::before { content: '⏱️'; }
+.sentence-life { color: #cc0000; font-weight: bold; }
+.detail-header { background: linear-gradient(180deg, #f5f3ee 0%, #e8e4dc 100%); border-bottom: 1px solid #aca899; padding: 10px 15px; }
+.detail-content { padding: 20px; background: #fff; height: calc(100% - 55px); overflow-y: auto; }
+.detail-card { background: linear-gradient(180deg, #fff 0%, #faf8f5 100%); border: 1px solid #aca899; border-radius: 6px; overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.1); }
+.detail-card-header { background: linear-gradient(180deg, #2b71e8 0%, #2063d0 100%); padding: 20px; display: flex; align-items: center; gap: 15px; }
+.detail-avatar { width: 64px; height: 64px; background: linear-gradient(135deg, #f0f0f0 0%, #d0d0d0 100%); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: 32px; box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+.detail-title h2 { color: #fff; font-size: 20px; margin-bottom: 4px; text-shadow: 1px 1px 2px rgba(0,0,0,0.3); }
+.detail-title p { color: rgba(255,255,255,0.8); font-size: 13px; font-style: italic; }
+.detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; background: #aca899; border-bottom: 1px solid #aca899; }
+.detail-grid-item { background: #f8f6f0; padding: 12px 15px; }
+.detail-grid-label { font-size: 10px; color: #666; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+.detail-grid-value { font-size: 13px; color: #333; font-weight: bold; }
+.detail-sections { padding: 20px; }
+.detail-section { margin-bottom: 20px; }
+.detail-section:last-child { margin-bottom: 0; }
+.detail-section-title { font-size: 12px; font-weight: bold; color: #003399; margin-bottom: 8px; padding-bottom: 5px; border-bottom: 1px solid #ddd; display: flex; align-items: center; gap: 6px; }
+.detail-section-content { font-size: 12px; color: #333; line-height: 1.6; white-space: pre-wrap; }
+.admin-notes-section { background: linear-gradient(180deg, #fff8e0 0%, #fff4cc 100%); border: 1px solid #e6b800; border-radius: 4px; padding: 15px; }
+.admin-notes-section .detail-section-title { color: #996600; border-bottom-color: #e6b800; }
+.detail-actions { padding: 15px 20px; background: #f0ece4; border-top: 1px solid #aca899; display: flex; gap: 10px; }
+.form-content { padding: 20px; background: #fff; height: calc(100% - 55px); overflow-y: auto; }
+.form-card { background: #faf8f5; border: 1px solid #aca899; border-radius: 6px; overflow: hidden; }
+.form-section { padding: 20px; border-bottom: 1px solid #e0dcd4; }
+.form-section:last-child { border-bottom: none; }
+.form-section-title { font-size: 13px; font-weight: bold; color: #003399; margin-bottom: 15px; display: flex; align-items: center; gap: 8px; }
+.form-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; }
+.form-field { display: flex; flex-direction: column; }
+.form-field.full-width { grid-column: 1 / -1; }
+.form-field .xp-label { font-weight: bold; margin-bottom: 5px; }
+.form-field .required::after { content: ' *'; color: #cc0000; }
+.form-checkbox { display: flex; align-items: center; gap: 8px; padding-top: 25px; }
+.form-checkbox .xp-label { margin: 0; font-weight: normal; }
+.form-textarea { min-height: 80px; resize: vertical; }
+.form-admin-section { background: linear-gradient(180deg, #fff8e0 0%, #fff4cc 100%); border: 1px solid #e6b800; }
+.form-admin-section .form-section-title { color: #996600; }
+.form-message { padding: 10px 15px; border-radius: 4px; font-size: 12px; margin-top: 15px; }
+.form-error { background: #ffe6e6; border: 1px solid #cc0000; color: #cc0000; }
+.form-success { background: #e6ffe6; border: 1px solid #00aa00; color: #006600; }
+.form-actions { padding: 15px 20px; background: #f0ece4; display: flex; justify-content: flex-end; gap: 10px; }
+#delete-modal { position: fixed; inset: 0; background: rgba(0,0,0,0.5); display: none; justify-content: center; align-items: center; z-index: 1020; }
+.modal-window { width: 360px; background: var(--xp-window-bg); border-radius: 8px 8px 0 0; box-shadow: 0 8px 32px rgba(0,0,0,0.4); overflow: hidden; }
+.modal-title-bar { height: 28px; background: linear-gradient(180deg, #0058ee 0%, #3a93ff 8%, #2b7fff 15%, #1872eb 85%, #0855dd 92%, #0044bb 100%); border-radius: 6px 6px 0 0; padding: 0 8px; display: flex; align-items: center; justify-content: space-between; }
+.modal-title-bar span { color: #fff; font-size: 12px; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); }
+.modal-content { padding: 25px; display: flex; gap: 15px; }
+.modal-icon { width: 48px; height: 48px; display: flex; align-items: center; justify-content: center; font-size: 40px; }
+.modal-text { flex: 1; }
+.modal-text h3 { font-size: 13px; color: #000; margin-bottom: 10px; }
+.modal-text p { font-size: 12px; color: #333; line-height: 1.5; }
+.modal-actions { padding: 15px 25px; background: #f0ece4; display: flex; justify-content: flex-end; gap: 10px; }
+#no-results { text-align: center; padding: 60px 20px; color: #666; }
+#no-results::before { content: '🔍'; display: block; font-size: 48px; margin-bottom: 15px; opacity: 0.4; }
+.hidden { display: none !important; }
+.blurred { filter: blur(5px); user-select: none; pointer-events: none; }
+.user-badge { background: linear-gradient(180deg, #4CAF50 0%, #388E3C 100%); color: white; padding: 3px 10px; border-radius: 10px; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-left: 10px; }
+.user-badge.admin-badge { background: linear-gradient(180deg, #f44336 0%, #c62828 100%); }
+::-webkit-scrollbar { width: 17px; height: 17px; }
+::-webkit-scrollbar-track { background: #f0f0f0; border: 1px solid #d0d0d0; }
+::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #fff 0%, #e8e8e8 40%, #d0d0d0 60%, #c0c0c0 100%); border: 1px solid #808080; }
+::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #fff 0%, #f0f0f0 40%, #e0e0e0 60%, #d0d0d0 100%); }
+::-webkit-scrollbar-button { background: linear-gradient(180deg, #fff 0%, #e8e8e8 40%, #d0d0d0 60%, #c0c0c0 100%); border: 1px solid #808080; height: 17px; width: 17px; }
+::-webkit-scrollbar-corner { background: #f0f0f0; }
+</style>
+</head>
+<body>
+
+<!-- Continue dans la partie 3 avec tout le HTML et JavaScript... --><!-- Suite du HTML depuis la partie 2 -->
+
+<div id="bios">
+  <div id="bios-header">PHOENIX - AWARD BIOS CMOS SETUP UTILITY</div>
+  <div id="bios-text"></div>
+  <div id="bios-prompt">Press any key to continue...</div>
+  <div id="bios-footer">
+    <span>F2: Setup | F12: Boot Menu</span>
+    <span>v4.2.1 © 2025 Brolingboke Systems</span>
+  </div>
+</div>
+
+<div id="boot">
+  <svg id="boot-logo" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <linearGradient id="g1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00a2ff"/><stop offset="100%" style="stop-color:#003399"/></linearGradient>
+      <linearGradient id="g2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ff6600"/><stop offset="100%" style="stop-color:#ff3300"/></linearGradient>
+      <linearGradient id="g3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00cc66"/><stop offset="100%" style="stop-color:#009933"/></linearGradient>
+      <linearGradient id="g4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ffcc00"/><stop offset="100%" style="stop-color:#ff9900"/></linearGradient>
+    </defs>
+    <rect x="20" y="20" width="75" height="75" rx="8" fill="url(#g1)" transform="rotate(-5 57.5 57.5)"/>
+    <rect x="105" y="20" width="75" height="75" rx="8" fill="url(#g2)" transform="rotate(5 142.5 57.5)"/>
+    <rect x="20" y="105" width="75" height="75" rx="8" fill="url(#g3)" transform="rotate(5 57.5 142.5)"/>
+    <rect x="105" y="105" width="75" height="75" rx="8" fill="url(#g4)" transform="rotate(-5 142.5 142.5)"/>
+  </svg>
+  <div id="boot-text">GrandLine<sup>®</sup></div>
+  <div id="boot-dots"><span></span><span></span><span></span></div>
+</div>
+
+<div id="startup">
+  <div id="startup-logo-container">
+    <svg id="startup-logo-img" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="s1" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00a2ff"/><stop offset="100%" style="stop-color:#003399"/></linearGradient>
+        <linearGradient id="s2" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ff6600"/><stop offset="100%" style="stop-color:#ff3300"/></linearGradient>
+        <linearGradient id="s3" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#00cc66"/><stop offset="100%" style="stop-color:#009933"/></linearGradient>
+        <linearGradient id="s4" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" style="stop-color:#ffcc00"/><stop offset="100%" style="stop-color:#ff9900"/></linearGradient>
+      </defs>
+      <rect x="20" y="20" width="75" height="75" rx="8" fill="url(#s1)" transform="rotate(-5 57.5 57.5)"/>
+      <rect x="105" y="20" width="75" height="75" rx="8" fill="url(#s2)" transform="rotate(5 142.5 57.5)"/>
+      <rect x="20" y="105" width="75" height="75" rx="8" fill="url(#s3)" transform="rotate(5 57.5 142.5)"/>
+      <rect x="105" y="105" width="75" height="75" rx="8" fill="url(#s4)" transform="rotate(-5 142.5 142.5)"/>
+    </svg>
+    <div id="startup-logo"><span>Grand</span>Line XP</div>
+  </div>
+  <div id="startup-bar-container">
+    <div id="startup-bar"><div id="startup-progress"></div></div>
+  </div>
+  <div id="startup-text">Chargement des paramètres personnels...</div>
+</div>
+
+<div id="desktop">
+  <div id="desktop-wallpaper"></div>
+  <div id="desktop-icons">
+    <div class="desktop-icon computer-icon" id="computer-icon">
+      <div class="desktop-icon-img">💻</div>
+      <div class="desktop-icon-label">Poste de<br>travail</div>
+    </div>
+    <div class="desktop-icon" id="doc-icon">
+      <div class="desktop-icon-img">🏛️</div>
+      <div class="desktop-icon-label">Brolingboke<br>D.O.C.</div>
+    </div>
+    <div class="desktop-icon folder-icon" id="documents-icon">
+      <div class="desktop-icon-img">📁</div>
+      <div class="desktop-icon-label">Mes<br>documents</div>
+    </div>
+    <div class="desktop-icon email-icon" id="email-icon">
+      <div class="desktop-icon-img">📧</div>
+      <div class="desktop-icon-label">Courrier<br>électronique</div>
+    </div>
+    <div class="desktop-icon recycle-icon" id="recycle-icon">
+      <div class="desktop-icon-img">🗑️</div>
+      <div class="desktop-icon-label">Corbeille</div>
+    </div>
+  </div>
+</div>
+
+<div id="taskbar">
+  <button id="start-btn"><span class="start-orb">⊞</span>démarrer</button>
+  <div id="taskbar-programs"></div>
+  <div id="system-tray">
+    <span class="tray-icon" id="volume-icon">🔊</span>
+    <span class="tray-icon">🛡️</span>
+    <span id="clock"></span>
+  </div>
+</div>
+
+<!-- Menu démarrer -->
+<div id="start-menu">
+  <div id="start-menu-header">
+    <div id="start-menu-avatar">👤</div>
+    <div id="start-menu-user">
+      <div id="start-menu-user-name">Utilisateur</div>
+      <div id="start-menu-user-role">Agent Brolingboke D.O.C.</div>
+    </div>
+  </div>
+  <div id="start-menu-content">
+    <div id="start-menu-left">
+      <div class="start-menu-item" data-app="doc">
+        <div class="start-menu-item-icon">🏛️</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Brolingboke D.O.C.</div>
+          <div class="start-menu-item-desc">Base de données des détenus</div>
+        </div>
+      </div>
+      <div class="start-menu-item" data-app="email">
+        <div class="start-menu-item-icon">📧</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Courrier électronique</div>
+          <div class="start-menu-item-desc">Messagerie interne</div>
+        </div>
+      </div>
+      <div class="start-menu-item" data-app="explorer">
+        <div class="start-menu-item-icon">📁</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Explorateur de fichiers</div>
+          <div class="start-menu-item-desc">Parcourir vos documents</div>
+        </div>
+      </div>
+      <div class="start-menu-item" data-app="calendar">
+        <div class="start-menu-item-icon">📅</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Calendrier</div>
+          <div class="start-menu-item-desc">Planifier vos tâches</div>
+        </div>
+      </div>
+      <div class="start-menu-item" data-app="minesweeper">
+        <div class="start-menu-item-icon">💣</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Démineur</div>
+          <div class="start-menu-item-desc">Jeu de réflexion</div>
+        </div>
+      </div>
+      <div class="start-menu-item" data-app="settings">
+        <div class="start-menu-item-icon">⚙️</div>
+        <div class="start-menu-item-text">
+          <div class="start-menu-item-name">Paramètres</div>
+          <div class="start-menu-item-desc">Configuration système</div>
+        </div>
+      </div>
+    </div>
+    <div id="start-menu-right">
+      <div class="start-menu-section">
+        <div class="start-menu-section-title">Favoris</div>
+        <div class="start-menu-shortcut" data-path="documents">
+          <div class="start-menu-shortcut-icon">📁</div>
+          <div class="start-menu-shortcut-text">Mes documents</div>
+        </div>
+        <div class="start-menu-shortcut" data-path="desktop">
+          <div class="start-menu-shortcut-icon">🖥️</div>
+          <div class="start-menu-shortcut-text">Bureau</div>
+        </div>
+        <div class="start-menu-shortcut" data-path="computer">
+          <div class="start-menu-shortcut-icon">💻</div>
+          <div class="start-menu-shortcut-text">Poste de travail</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div id="start-menu-footer">
+    <button class="start-menu-footer-btn" id="logoff-btn">
+      <span>👋</span> Fermer la session
+    </button>
+    <button class="start-menu-footer-btn" id="shutdown-btn">
+      <span>⏻</span> Éteindre
+    </button>
+  </div>
+</div>
+
+<!-- Popup volume -->
+<div id="volume-popup">
+  <div style="font-size: 20px; margin-bottom: 5px;">🔊</div>
+  <input type="range" id="volume-slider" min="0" max="100" value="50" orient="vertical">
+  <div style="font-size: 10px; margin-top: 5px;">50%</div>
+</div>
+
+<!-- Zone de notifications -->
+<div id="notification-area"></div>
+
+<!-- Explorateur de fichiers -->
+<div class="window explorer-window" id="explorer-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">📁</span>
+    <span class="title-bar-text" id="explorer-title">Mes documents</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="explorer-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div class="explorer-toolbar">
+      <button class="toolbar-btn" id="back-btn" disabled>◀ Retour</button>
+      <button class="toolbar-btn" id="up-btn">▲</button>
+      <button class="toolbar-btn" id="refresh-btn">🔄</button>
+      <div class="address-bar-container">
+        <span class="address-bar-label">Adresse</span>
+        <input type="text" class="address-bar" id="address-bar" readonly>
+      </div>
+    </div>
+    <div class="explorer-content">
+      <div class="explorer-sidebar">
+        <div class="sidebar-section">
+          <div class="sidebar-title">Dossiers</div>
+          <div class="sidebar-item" data-path="desktop">🖥️ Bureau</div>
+          <div class="sidebar-item active" data-path="documents">📁 Mes documents</div>
+          <div class="sidebar-item" data-path="computer">💻 Poste de travail</div>
+        </div>
+      </div>
+      <div class="explorer-main" id="explorer-main"></div>
+    </div>
+    <div class="explorer-statusbar">
+      <span id="file-count">0 objets</span>
+    </div>
+  </div>
+</div>
+
+<!-- Bloc-notes -->
+<div class="window notepad-window" id="notepad-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">📝</span>
+    <span class="title-bar-text" id="notepad-title">Sans titre - Bloc-notes</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="notepad-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <textarea class="notepad-textarea" id="notepad-content" readonly></textarea>
+  </div>
+</div>
+
+<!-- Démineur -->
+<div class="window game-window" id="minesweeper-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">💣</span>
+    <span class="title-bar-text">Démineur</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="minesweeper-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div class="game-content">
+      <div class="game-info">
+        <div>💣 Mines: <span id="mines-count">10</span></div>
+        <div>⏱️ Temps: <span id="game-time">0</span>s</div>
+      </div>
+      <div id="minesweeper-grid" class="minesweeper-grid"></div>
+      <button class="xp-button xp-button-primary" id="new-game-btn">🎮 Nouvelle partie</button>
+    </div>
+  </div>
+</div>
+
+<!-- Email -->
+<div class="window email-window" id="email-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">📧</span>
+    <span class="title-bar-text">Courrier électronique - Brolingboke Mail</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="email-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div class="email-content">
+      <div class="email-sidebar">
+        <div class="email-folder active" data-folder="inbox">
+          📥 Boîte de réception <span style="font-weight:bold;color:#cc0000;">(3)</span>
+        </div>
+        <div class="email-folder" data-folder="sent">📤 Messages envoyés</div>
+        <div class="email-folder" data-folder="drafts">📝 Brouillons</div>
+        <div class="email-folder" data-folder="trash">🗑️ Corbeille</div>
+      </div>
+      <div class="email-list" id="email-list"></div>
+      <div class="email-preview" id="email-preview">
+        <p style="text-align:center;color:#999;padding:60px 20px;">Sélectionnez un message pour l'afficher</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Calendrier -->
+<div class="window calendar-window" id="calendar-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">📅</span>
+    <span class="title-bar-text">Calendrier</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="calendar-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div class="calendar-content">
+      <div class="calendar-header">
+        <button class="xp-button" id="prev-month-btn">◀</button>
+        <div class="calendar-month" id="calendar-month">Janvier 2026</div>
+        <button class="xp-button" id="next-month-btn">▶</button>
+      </div>
+      <div class="calendar-grid" id="calendar-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Paramètres -->
+<div class="window settings-window" id="settings-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">⚙️</span>
+    <span class="title-bar-text">Paramètres système</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="settings-close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div class="settings-content">
+      <div class="settings-section">
+        <div class="settings-title">🎨 Apparence</div>
+        <div class="settings-option">
+          <div class="settings-option-label">Thème du bureau</div>
+          <div class="settings-option-control">
+            <select class="xp-select" id="theme-select">
+              <option value="blue">Bleu Windows XP</option>
+              <option value="olive">Vert olive</option>
+              <option value="silver">Argent</option>
+            </select>
+          </div>
+        </div>
+        <div class="settings-option">
+          <div class="settings-option-label">Afficher les icônes du bureau</div>
+          <div class="settings-option-control">
+            <input type="checkbox" class="xp-checkbox" checked id="show-icons-checkbox">
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">🔊 Son</div>
+        <div class="settings-option">
+          <div class="settings-option-label">Volume principal</div>
+          <div class="settings-option-control">
+            <input type="range" min="0" max="100" value="50" id="main-volume-slider">
+            <span id="volume-display">50%</span>
+          </div>
+        </div>
+        <div class="settings-option">
+          <div class="settings-option-label">Sons système</div>
+          <div class="settings-option-control">
+            <input type="checkbox" class="xp-checkbox" checked id="system-sounds-checkbox">
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">🔔 Notifications</div>
+        <div class="settings-option">
+          <div class="settings-option-label">Afficher les notifications</div>
+          <div class="settings-option-control">
+            <input type="checkbox" class="xp-checkbox" checked id="notifications-checkbox">
+          </div>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-title">ℹ️ Informations système</div>
+        <div style="font-size:11px;line-height:1.6;color:#333;">
+          <strong>Système d'exploitation:</strong> GrandLine XP Professional<br>
+          <strong>Version:</strong> 5.1.2600 Service Pack 3<br>
+          <strong>Ordinateur:</strong> BROLINGBOKE-PC<br>
+          <strong>Processeur:</strong> Intel Pentium 4 3.20GHz<br>
+          <strong>Mémoire RAM:</strong> 512 MB<br>
+          <strong>Licence:</strong> Brolingboke D.O.C. Enterprise
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Fenêtre principale D.O.C. -->
+<div class="window" id="main-window">
+  <div class="title-bar">
+    <span class="title-bar-icon">🏛️</span>
+    <span class="title-bar-text">Brolingboke D.O.C. - Base de Données des Détenus</span>
+    <div class="title-bar-buttons">
+      <button class="title-bar-button btn-minimize">_</button>
+      <button class="title-bar-button btn-maximize">□</button>
+      <button class="title-bar-button btn-close" id="close-btn">✕</button>
+    </div>
+  </div>
+  <div class="window-content">
+    <div id="login-view" class="login-view" style="display:flex">
+      <div class="login-box">
+        <div class="login-header">
+          <div class="login-header-icon">🏛️</div>
+          <div class="login-header-text">Connexion Sécurisée</div>
+        </div>
+        <div class="login-body">
+          <div id="login-error" class="login-error"></div>
+          <div class="login-field">
+            <label class="xp-label" for="email">Identifiant :</label>
+            <input type="text" id="email" class="xp-input" placeholder="Entrez votre identifiant">
+          </div>
+          <div class="login-field">
+            <label class="xp-label" for="password">Mot de passe :</label>
+            <input type="password" id="password" class="xp-input" placeholder="Entrez votre mot de passe">
+          </div>
+          <div class="login-actions">
+            <button type="button" id="login-btn" class="xp-button xp-button-primary">Se connecter</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="main-view" style="display:none">
+      <div class="main-header">
+        <h1>Registre des Détenus <span id="user-role-badge" class="user-badge"></span></h1>
+        <button id="add-inmate-btn" class="xp-button" style="display:none">➕ Ajouter un détenu</button>
+      </div>
+      <div class="main-toolbar">
+        <div class="search-container">
+          <input type="search" id="search-input" class="xp-input" placeholder="Rechercher par nom, alias, crime, cellule...">
+        </div>
+      </div>
+      <div class="main-content">
+        <div id="inmates-list"></div>
+        <div id="no-results" class="hidden">Aucun détenu trouvé correspondant à votre recherche.</div>
+      </div>
+    </div>
+    <div id="detail-view" style="display:none">
+      <div class="detail-header">
+        <button id="back-to-list-btn" class="xp-button">◀ Retour à la liste</button>
+      </div>
+      <div class="detail-content">
+        <div class="detail-card">
+          <div class="detail-card-header">
+            <div class="detail-avatar">👤</div>
+            <div class="detail-title">
+              <h2 id="detail-name"></h2>
+              <p id="detail-alias"></p>
+            </div>
+          </div>
+          <div class="detail-grid">
+            <div class="detail-grid-item"><div class="detail-grid-label">Âge</div><div class="detail-grid-value" id="detail-age"></div></div>
+            <div class="detail-grid-item"><div class="detail-grid-label">Bloc</div><div class="detail-grid-value" id="detail-block"></div></div>
+            <div class="detail-grid-item"><div class="detail-grid-label">Cellule</div><div class="detail-grid-value" id="detail-cell"></div></div>
+            <div class="detail-grid-item"><div class="detail-grid-label">Durée de peine</div><div class="detail-grid-value" id="detail-sentence"></div></div>
+            <div class="detail-grid-item"><div class="detail-grid-label">Date d'incarcération</div><div class="detail-grid-value" id="detail-start-date"></div></div>
+            <div class="detail-grid-item"><div class="detail-grid-label">Date de libération</div><div class="detail-grid-value" id="detail-end-date"></div></div>
+          </div>
+          <div class="detail-sections">
+            <div class="detail-section"><div class="detail-section-title">📋 Détails du Crime</div><div class="detail-section-content" id="detail-crime"></div></div>
+            <div class="detail-section"><div class="detail-section-title">📖 Historique</div><div class="detail-section-content" id="detail-backstory"></div></div>
+            <div class="detail-section"><div class="detail-section-title">👨‍👩‍👧‍👦 Famille & Relations</div><div class="detail-section-content" id="detail-family"></div></div>
+            <div id="detail-admin-notes-section" class="detail-section admin-notes-section hidden"><div class="detail-section-title">⚠️ Notes Internes (Admin)</div><div class="detail-section-content" id="detail-admin-notes"></div></div>
+          </div>
+          <div id="detail-admin-buttons" class="detail-actions hidden">
+            <button id="edit-inmate-btn" class="xp-button">✏️ Modifier</button>
+            <button id="delete-inmate-btn" class="xp-button xp-button-danger">🗑️ Supprimer</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div id="form-view" style="display:none">
+      <div class="detail-header"><button id="back-from-form-btn" class="xp-button">◀ Retour</button></div>
+      <div class="form-content">
+        <form id="inmate-form" class="form-card">
+          <input type="hidden" id="inmate-id">
+          <div class="form-section">
+            <div class="form-section-title">👤 Informations d'Identité</div>
+            <div class="form-grid">
+              <div class="form-field"><label class="xp-label required" for="name">Nom Complet</label><input type="text" id="name" class="xp-input" required></div>
+              <div class="form-field"><label class="xp-label" for="alias">Alias / Surnom</label><input type="text" id="alias" class="xp-input"></div>
+              <div class="form-field"><label class="xp-label required" for="age">Âge</label><input type="number" id="age" class="xp-input" required min="18" max="120"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title">🏢 Informations d'Incarcération</div>
+            <div class="form-grid">
+              <div class="form-field"><label class="xp-label required" for="block">Bloc</label><input type="text" id="block" class="xp-input" required maxlength="10"></div>
+              <div class="form-field"><label class="xp-label required" for="cell">Cellule</label><input type="text" id="cell" class="xp-input" required maxlength="10"></div>
+              <div class="form-field"><label class="xp-label" for="sentenceDuration">Durée de la peine</label><input type="text" id="sentenceDuration" class="xp-input" placeholder="Ex: 25 ans"></div>
+              <div class="form-field form-checkbox"><input type="checkbox" id="isLifeSentence" class="xp-checkbox"><label class="xp-label" for="isLifeSentence">Condamnation à perpétuité</label></div>
+              <div class="form-field"><label class="xp-label" for="startDate">Date d'incarcération</label><input type="date" id="startDate" class="xp-input"></div>
+              <div class="form-field"><label class="xp-label" for="endDate">Date de libération prévue</label><input type="date" id="endDate" class="xp-input"></div>
+            </div>
+          </div>
+          <div class="form-section">
+            <div class="form-section-title">📋 Dossier</div>
+            <div class="form-grid">
+              <div class="form-field full-width"><label class="xp-label" for="crimeDetails">Détails du crime</label><textarea id="crimeDetails" class="xp-input form-textarea"></textarea></div>
+              <div class="form-field full-width"><label class="xp-label" for="backstory">Historique / Parcours</label><textarea id="backstory" class="xp-input form-textarea"></textarea></div>
+              <div class="form-field full-width"><label class="xp-label" for="family">Famille & Relations</label><textarea id="family" class="xp-input form-textarea"></textarea></div>
+            </div>
+          </div>
+          <div id="form-admin-notes-section" class="form-section form-admin-section hidden">
+            <div class="form-section-title">⚠️ Notes Internes (Admin uniquement)</div>
+            <div class="form-field"><textarea id="adminNotes" class="xp-input form-textarea" placeholder="Notes confidentielles visibles uniquement par les administrateurs..."></textarea></div>
+          </div>
+          <div id="form-error" class="form-message form-error hidden"></div>
+          <div id="form-success" class="form-message form-success hidden"></div>
+          <div class="form-actions">
+            <button type="button" id="cancel-form-btn" class="xp-button">Annuler</button>
+            <button type="submit" class="xp-button xp-button-primary">💾 Enregistrer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="delete-modal">
+  <div class="modal-window">
+    <div class="modal-title-bar"><span>Confirmation</span></div>
+    <div class="modal-content">
+      <div class="modal-icon">⚠️</div>
+      <div class="modal-text">
+        <h3>Confirmer la suppression</h3>
+        <p>Êtes-vous sûr de vouloir supprimer définitivement ce dossier de détenu ? Cette action est irréversible.</p>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button id="cancel-delete-btn" class="xp-button">Non</button>
+      <button id="confirm-delete-btn" class="xp-button xp-button-danger">Oui, supprimer</button>
+    </div>
+  </div>
+</div>
+
+<script>
+// Variables globales
+let u=null,r='none',v='login',ci=null,dt=null,kp=false;
+let currentPath='documents',openWindows=new Set(),pathHistory=[],volumeLevel=50;
+let currentMonth=0,currentYear=2026,gameTime=0,gameInterval=null,minesweeperStarted=false;
+let currentEmail=null;
+
+// Système de fichiers virtuel
+const fileSystem={
+  desktop:[
+    {name:'Poste de travail',type:'computer',icon:'💻'},
+    {name:'Brolingboke D.O.C.',type:'app',icon:'🏛️'},
+    {name:'Mes documents',type:'folder',icon:'📁',path:'documents'},
+    {name:'Courrier électronique',type:'app',icon:'📧',app:'email'},
+    {name:'Corbeille',type:'recycle',icon:'🗑️'}
+  ],
+  documents:[
+    {name:'Personnel',type:'folder',icon:'📁',path:'documents/personnel'},
+    {name:'Rapports',type:'folder',icon:'📁',path:'documents/rapports'},
+    {name:'Readme.txt',type:'file',icon:'📄',content:'Bienvenue dans le système Brolingboke D.O.C.\n\nCe système contient des informations sensibles.\nAccès réservé au personnel autorisé uniquement.\n\n© 2025 Brolingboke Correctional Systems'}
+  ],
+  'documents/personnel':[
+    {name:'Notes personnelles',type:'folder',icon:'📁',path:'documents/personnel/notes'},
+    {name:'CV.txt',type:'file',icon:'📄',content:'Curriculum Vitae\n\nAgent de correction pénitentiaire\nBrolingboke Department of Corrections\n\nExpérience: 8 ans\nFormation: Académie de police de Los Santos\n\nCompétences:\n- Gestion de crise\n- Communication interpersonnelle\n- Connaissance du système judiciaire'}
+  ],
+  'documents/personnel/notes':[
+    {name:'Si jamais j\'oublie.txt',type:'file',icon:'📄',content:'Si jamais j\'oublie...\n\n================================\n   IDENTIFIANTS D\'ACCÈS\n================================\n\nIdentifiant : user\nMDP : user\n\n================================\n\nNe pas perdre ce fichier !'},
+    {name:'Liste courses.txt',type:'file',icon:'📄',content:'Liste de courses:\n\n- Lait\n- Pain\n- Œufs\n- Café\n- Fruits\n- Légumes\n- Poulet\n- Riz'},
+    {name:'Idées weekend.txt',type:'file',icon:'📄',content:'Idées pour le weekend:\n\n- Cinéma avec les amis\n- Randonnée au Chiliad\n- Barbecue en famille\n- Finir la série en cours\n- Repos bien mérité'}
+  ],
+  'documents/rapports':[
+    {name:'Rapport_Janvier_2025.txt',type:'file',icon:'📄',content:'RAPPORT MENSUEL - JANVIER 2025\n\nBrolingboke D.O.C.\n\nPopulation carcérale: 847 détenus\nIncidents: 12\nDisciplinaires: 23\nVisites: 156\n\nCommentaires:\nMois calme dans l\'ensemble.\nQuelques tensions au bloc C.\nFormation du nouveau personnel réussie.'},
+    {name:'Rapport_Février_2025.txt',type:'file',icon:'📄',content:'RAPPORT MENSUEL - FÉVRIER 2025\n\nBrolingboke D.O.C.\n\nPopulation carcérale: 851 détenus\nIncidents: 8\nDisciplinaires: 19\nVisites: 142\n\nCommentaires:\nAmélioration générale du comportement.\nNouveau programme de réinsertion lancé.'}
+  ],
+  computer:[
+    {name:'Disque local (C:)',type:'drive',icon:'💾'},
+    {name:'Lecteur CD (D:)',type:'cd',icon:'💿'},
+    {name:'Mes documents',type:'folder',icon:'📁',path:'documents'}
+  ]
+};
+
+// Emails
+const emails={
+  inbox:[
+    {id:1,from:'Direction Brolingboke',subject:'Nouvelle procédure de sécurité',date:'30/01/2026',preview:'À partir du 1er février, tous les agents devront...',unread:true,body:'À partir du 1er février, tous les agents devront utiliser leur badge RFID pour accéder aux zones sécurisées.\n\nLa direction rappelle que les procédures de sécurité sont essentielles pour garantir la sûreté de tous.\n\nMerci de votre coopération.\n\nDirection Brolingboke D.O.C.'},
+    {id:2,from:'RH - Service du personnel',subject:'Rappel: Formation obligatoire',date:'29/01/2026',preview:'La formation sur les nouvelles réglementations...',unread:true,body:'Bonjour,\n\nNous vous rappelons que la formation sur les nouvelles réglementations pénitentiaires aura lieu le 5 février à 14h00 en salle de conférence.\n\nPrésence obligatoire.\n\nCordialement,\nService RH'},
+    {id:3,from:'Comptoir du personnel',subject:'Vos fiches de paie sont disponibles',date:'28/01/2026',preview:'Vos fiches de paie pour le mois de janvier...',unread:false,body:'Bonjour,\n\nVos fiches de paie pour le mois de janvier sont maintenant disponibles sur le portail interne.\n\nConnectez-vous avec vos identifiants habituels.\n\nBonne journée,\nComptabilité'}
+  ],
+  sent:[],
+  drafts:[],
+  trash:[]
+};
+
+// Base de données des détenus
+let inmates=[
+  {id:"1",name:"John Marston",alias:"L'Ancien",age:45,block:"C",cell:"301",sentenceDuration:"Perpétuité",startDate:"2018-05-20",endDate:"",isLifeSentence:true,crimeDetails:"Braquage de banque multiple, meurtre sur agent fédéral.",backstory:"Ancien membre d'un gang notoire. Arrêté après une longue traque.",family:"Épouse et fils à l'extérieur.",adminNotes:"Très calme, mais ne pas sous-estimer. Danger potentiel."},
+  {id:"2",name:"Trevor Philips",alias:"TP",age:48,block:"A",cell:"105",sentenceDuration:"40 ans",startDate:"2022-11-10",endDate:"2062-11-09",isLifeSentence:false,crimeDetails:"Trafic d'armes, fabrication de stupéfiants, 12 chefs d'accusation.",backstory:"Instable, violent. Arrêté lors d'un raid sur son laboratoire.",family:"Inconnue.",adminNotes:"Placement à l'isolement fréquent. Haut risque."},
+  {id:"3",name:"Michael De Santa",alias:"Mikey",age:52,block:"D",cell:"202",sentenceDuration:"15 ans",startDate:"2023-01-15",endDate:"2038-01-14",isLifeSentence:false,crimeDetails:"Fraude boursière, association de malfaiteurs, extorsion.",backstory:"S'est fait arrêter après avoir témoigné contre ses anciens partenaires.",family:"Famille en protection des témoins.",adminNotes:"Cible potentielle. Contacts à l'intérieur."},
+  {id:"4",name:"Franklin Clinton",alias:"Frank",age:31,block:"B",cell:"112",sentenceDuration:"8 ans",startDate:"2024-02-28",endDate:"2032-02-27",isLifeSentence:false,crimeDetails:"Vol de voitures de luxe, recel, course poursuite à grande vitesse.",backstory:"Arrêté en flagrant délit lors d'une tentative de vol chez un producteur de cinéma.",family:"Tante à Strawberry. Petite amie visite régulièrement.",adminNotes:"Bonne conduite pour l'instant. Travaille aux ateliers."},
+  {id:"5",name:"Lester Crest",alias:"Le Cerveau",age:50,block:"ISO",cell:"001",sentenceDuration:"Perpétuité",startDate:"2023-07-19",endDate:"",isLifeSentence:true,crimeDetails:"Cybercriminalité à grande échelle, espionnage industriel, manipulation des marchés financiers.",backstory:"A piraté le réseau du FIB et de l'IAA. Considéré comme une menace pour la sécurité nationale.",family:"Aucune visite.",adminNotes:"Surveillance 24/7. Ne doit approcher aucun équipement électronique."},
+  {id:"6",name:"Amanda De Santa",alias:"Mandy",age:49,block:"F",cell:"101",sentenceDuration:"5 ans",startDate:"2023-03-10",endDate:"2028-03-09",isLifeSentence:false,crimeDetails:"Détournement de fonds, complicité de fraude, vol à l'étalage.",backstory:"Arrêtée pour avoir utilisé les cartes de crédit de son instructeur de tennis.",family:"Enfants visitent occasionnellement. Mari incarcéré.",adminNotes:"Manipulatrice. Tente d'obtenir des faveurs des gardiens."},
+  {id:"7",name:"Lamar Davis",alias:"LD",age:32,block:"B",cell:"113",sentenceDuration:"3 ans",startDate:"2024-05-01",endDate:"2027-04-30",isLifeSentence:false,crimeDetails:"Possession de stupéfiants avec intention de revente, violation de probation.",backstory:"Arrêté lors d'un contrôle de routine. Tentative de fuite.",family:"Visites régulières de F. Clinton (avant son incarcération).",adminNotes:"Grande gueule, mais peu dangereux. Facilement influençable."},
+  {id:"8",name:"Wei Cheng",alias:"Triade",age:55,block:"C",cell:"305",sentenceDuration:"25 ans",startDate:"2022-09-15",endDate:"2047-09-14",isLifeSentence:false,crimeDetails:"Dirigeant d'une organisation criminelle, trafic d'êtres humains, racket.",backstory:"Chef de la Triade de Los Santos. Arrêté après une opération conjointe FIB/IAA.",family:"Fils (Tao Cheng) gère les affaires à l'extérieur.",adminNotes:"Garde une influence majeure même en prison. Surveiller ses visiteurs."},
+  {id:"9",name:"Patricia Madrazo",alias:"Patty",age:58,block:"F",cell:"102",sentenceDuration:"18 mois",startDate:"2024-01-10",endDate:"2025-07-09",isLifeSentence:false,crimeDetails:"Complicité d'enlèvement (Syndrome de Stockholm), faux témoignage.",backstory:"A développé une relation avec l'un de ses ravisseurs (T. Philips).",family:"Mari refuse les visites. Enfants à l'étranger.",adminNotes:"Semble fragile, mais cache une forte volonté. Travaille à la bibliothèque."},
+  {id:"10",name:"Solomon Richards",alias:"Le Producteur",age:68,block:"D",cell:"101",sentenceDuration:"10 ans",startDate:"2023-11-05",endDate:"2033-11-04",isLifeSentence:false,crimeDetails:"Fraude fiscale massive, détournement de fonds de production.",backstory:"Légende de Vinewood tombée en disgrâce. A utilisé l'argent du studio pour couvrir des dettes de jeu.",family:"Aucune visite.",adminNotes:"Déprimé. Sous surveillance médicale pour risque suicidaire."}
+];
+
+// Fonctions utilitaires
+function upd(){const n=new Date();document.getElementById('clock').textContent=n.getHours().toString().padStart(2,'0')+':'+n.getMinutes().toString().padStart(2,'0');}
+
+function showNotification(icon,title,text){
+  const notif=document.createElement('div');
+  notif.className='notification';
+  notif.innerHTML=`
+    <div class="notification-icon">${icon}</div>
+    <div class="notification-content">
+      <div class="notification-title">${title}</div>
+      <div class="notification-text">${text}</div>
+    </div>
+    <div class="notification-close">✕</div>
+  `;
+  document.getElementById('notification-area').appendChild(notif);
+  notif.querySelector('.notification-close').addEventListener('click',()=>notif.remove());
+  notif.addEventListener('click',()=>notif.remove());
+  setTimeout(()=>notif.remove(),5000);
+}
+
+// Séquence BIOS
+function bios(){
+  const msgs=[{text:'BROLINGBOKE CORRECTIONAL SYSTEMS',class:'highlight'},{text:'Phoenix-Award BIOS v4.2.1, An Energy Star Ally',class:''},{text:'Copyright (C) 2025, Brolingboke Technologies Ltd.',class:''},{text:'',class:''},{text:'Main Processor : Intel(R) Pentium(R) 4 CPU 3.20GHz',class:''},{text:'Memory Testing :  524288K OK',class:'success'},{text:'',class:''},{text:'Detecting IDE Primary Master   ... SECURITY_DB_v1.0',class:'value'},{text:'Detecting IDE Primary Slave    ... INMATE_RECORDS',class:'value'},{text:'Detecting IDE Secondary Master ... DVD-ROM',class:'value'},{text:'Detecting IDE Secondary Slave  ... None',class:''},{text:'',class:''},{text:'Initializing security protocols...',class:''},{text:'Loading firewall configurations...',class:''},{text:'Mounting encrypted partitions... OK',class:'success'},{text:'Verifying biometric sensors... OK',class:'success'},{text:'',class:''},{text:'System initialization complete.',class:'highlight'}];
+  let i=0;const t=document.getElementById('bios-text');
+  const iv=setInterval(()=>{if(i<msgs.length){const l=document.createElement('div');l.textContent=msgs[i].text;if(msgs[i].class)l.className=msgs[i].class;t.appendChild(l);i++;}else clearInterval(iv);},80);
+  document.addEventListener('keydown',function kh(){if(!kp){kp=true;clearInterval(iv);document.removeEventListener('keydown',kh);setTimeout(()=>{document.getElementById('bios').style.display='none';document.getElementById('boot').style.display='flex';setTimeout(()=>{document.getElementById('boot').style.display='none';document.getElementById('startup').style.display='flex';startup();},2000);},300);}});
+}
+
+// Séquence de démarrage
+function startup(){
+  const msgs=['Chargement des paramètres personnels...','Application des paramètres de sécurité...','Connexion au serveur central...','Initialisation de la base de données...','Préparation du bureau...'];
+  let p=0,mi=0;const pb=document.getElementById('startup-progress'),txt=document.getElementById('startup-text');
+  const iv=setInterval(()=>{p+=Math.random()*4+2;pb.style.width=Math.min(p,100)+'%';const nm=Math.floor((p/100)*msgs.length);if(nm!==mi&&nm<msgs.length){mi=nm;txt.textContent=msgs[mi];}if(p>=100){clearInterval(iv);setTimeout(()=>{document.getElementById('startup').style.display='none';document.getElementById('desktop').style.display='block';document.getElementById('taskbar').style.display='flex';upd();setInterval(upd,1000);setTimeout(()=>showNotification('👋','Bienvenue','Système GrandLine XP chargé avec succès'),1000);},800);}},80);
+}
+
+// Explorateur de fichiers
+function openExplorer(path='documents'){
+  currentPath=path;
+  pathHistory.push(path);
+  const win=document.getElementById('explorer-window');
+  const main=document.getElementById('explorer-main');
+  const addressBar=document.getElementById('address-bar');
+  const title=document.getElementById('explorer-title');
+  const fileCount=document.getElementById('file-count');
+  const backBtn=document.getElementById('back-btn');
+  
+  win.style.display='block';
+  addTaskbarItem('explorer','📁','Explorateur');
+  
+  const pathParts=path.split('/');
+  const currentFolder=pathParts[pathParts.length-1];
+  title.textContent=currentFolder.charAt(0).toUpperCase()+currentFolder.slice(1);
+  addressBar.value='C:\\'+path.replace(/\//g,'\\');
+  
+  backBtn.disabled=pathHistory.length<=1;
+  
+  const files=fileSystem[path]||[];
+  main.innerHTML='<div class="file-grid"></div>';
+  const grid=main.querySelector('.file-grid');
+  
+  files.forEach(file=>{
+    const item=document.createElement('div');
+    item.className='file-item';
+    item.innerHTML=`
+      <div class="file-icon">${file.icon}</div>
+      <div class="file-name">${file.name}</div>
+    `;
+    
+    item.addEventListener('dblclick',()=>{
+      if(file.type==='folder'){
+        openExplorer(file.path);
+      }else if(file.type==='file'){
+        openNotepad(file.name,file.content);
+      }else if(file.type==='app'&&file.app==='email'){
+        openEmail();
+      }else if(file.type==='app'){
+        openDocApp();
+      }
+    });
+    
+    grid.appendChild(item);
+  });
+  
+  fileCount.textContent=`${files.length} objet${files.length>1?'s':''}`;
+  
+  document.querySelectorAll('.sidebar-item').forEach(item=>{
+    item.classList.remove('active');
+    if(item.dataset.path===path.split('/')[0]){
+      item.classList.add('active');
+    }
+  });
+}
+
+// Bloc-notes
+function openNotepad(filename,content){
+  const win=document.getElementById('notepad-window');
+  const title=document.getElementById('notepad-title');
+  const textarea=document.getElementById('notepad-content');
+  
+  win.style.display='block';
+  title.textContent=`${filename} - Bloc-notes`;
+  textarea.value=content;
+  addTaskbarItem('notepad','📝',filename);
+}
+
+// Application D.O.C.
+function openDocApp(){
+  document.getElementById('main-window').style.display='block';
+  addTaskbarItem('doc','🏛️','Brolingboke D.O.C.');
+  v='login';
+  ren();
+}
+
+// Email
+function openEmail(){
+  document.getElementById('email-window').style.display='block';
+  addTaskbarItem('email','📧','Courrier électronique');
+  loadEmails('inbox');
+}
+
+function loadEmails(folder){
+  const list=document.getElementById('email-list');
+  list.innerHTML='';
+  
+  document.querySelectorAll('.email-folder').forEach(f=>{
+    f.classList.remove('active');
+    if(f.dataset.folder===folder)f.classList.add('active');
+  });
+  
+  const msgs=emails[folder]||[];
+  msgs.forEach(email=>{
+    const item=document.createElement('div');
+    item.className='email-item'+(email.unread?' unread':'');
+    item.innerHTML=`
+      <div class="email-item-from">${email.from}</div>
+      <div class="email-item-subject">${email.subject}</div>
+      <div class="email-item-preview">${email.preview}</div>
+    `;
+    item.addEventListener('click',()=>showEmail(email));
+    list.appendChild(item);
+  });
+}
+
+function showEmail(email){
+  const preview=document.getElementById('email-preview');
+  preview.innerHTML=`
+    <div class="email-preview-header">
+      <div class="email-preview-from">De: ${email.from}</div>
+      <div class="email-preview-subject">${email.subject}</div>
+      <div class="email-preview-date">${email.date}</div>
+    </div>
+    <div class="email-preview-body">${email.body}</div>
+  `;
+  email.unread=false;
+  loadEmails('inbox');
+}
+
+// Calendrier
+function openCalendar(){
+  document.getElementById('calendar-window').style.display='block';
+  addTaskbarItem('calendar','📅','Calendrier');
+  renderCalendar();
+}
+
+function renderCalendar(){
+  const grid=document.getElementById('calendar-grid');
+  const monthNames=['Janvier','Février','Mars','Avril','Mai','Juin','Juillet','Août','Septembre','Octobre','Novembre','Décembre'];
+  const dayNames=['Lun','Mar','Mer','Jeu','Ven','Sam','Dim'];
+  
+  document.getElementById('calendar-month').textContent=`${monthNames[currentMonth]} ${currentYear}`;
+  
+  grid.innerHTML='';
+  dayNames.forEach(day=>{
+    const header=document.createElement('div');
+    header.className='calendar-day-header';
+    header.textContent=day;
+    grid.appendChild(header);
+  });
+  
+  const firstDay=new Date(currentYear,currentMonth,1).getDay();
+  const daysInMonth=new Date(currentYear,currentMonth+1,0).getDate();
+  const today=new Date();
+  
+  const startDay=firstDay===0?6:firstDay-1;
+  
+  for(let i=0;i<startDay;i++){
+    const blank=document.createElement('div');
+    blank.className='calendar-day other-month';
+    grid.appendChild(blank);
+  }
+  
+  for(let day=1;day<=daysInMonth;day++){
+    const cell=document.createElement('div');
+    cell.className='calendar-day';
+    cell.textContent=day;
+    
+    if(day===today.getDate()&&currentMonth===today.getMonth()&&currentYear===today.getFullYear()){
+      cell.classList.add('today');
+    }
+    
+    grid.appendChild(cell);
+  }
+}
+
+// Démineur
+function openMinesweeper(){
+  document.getElementById('minesweeper-window').style.display='block';
+  addTaskbarItem('minesweeper','💣','Démineur');
+  initMinesweeper();
+}
+
+function initMinesweeper(){
+  const grid=document.getElementById('minesweeper-grid');
+  grid.innerHTML='';
+  grid.style.gridTemplateColumns='repeat(8, 25px)';
+  
+  minesweeperStarted=false;
+  gameTime=0;
+  document.getElementById('game-time').textContent='0';
+  
+  if(gameInterval){
+    clearInterval(gameInterval);
+    gameInterval=null;
+  }
+  
+  const mines=[];
+  while(mines.length<10){
+    const pos=Math.floor(Math.random()*64);
+    if(!mines.includes(pos))mines.push(pos);
+  }
+  
+  for(let i=0;i<64;i++){
+    const cell=document.createElement('div');
+    cell.className='mine-cell';
+    cell.dataset.index=i;
+    cell.dataset.mine=mines.includes(i)?'1':'0';
+    
+    cell.addEventListener('click',()=>{
+      if(!minesweeperStarted){
+        minesweeperStarted=true;
+        gameInterval=setInterval(()=>{
+          gameTime++;
+          document.getElementById('game-time').textContent=gameTime;
+        },1000);
+      }
+      
+      if(cell.dataset.mine==='1'){
+        cell.classList.add('revealed','mine');
+        clearInterval(gameInterval);
+        showNotification('💥','Partie terminée','Vous avez touché une mine !');
+        setTimeout(initMinesweeper,2000);
+      }else{
+        cell.classList.add('revealed');
+        const neighbors=getNeighborMines(i,mines);
+        if(neighbors>0){
+          cell.textContent=neighbors;
+          cell.style.color=['','blue','green','red','purple','maroon','turquoise','black','gray'][neighbors];
+        }
+      }
+    });
+    
+    cell.addEventListener('contextmenu',e=>{
+      e.preventDefault();
+      cell.classList.toggle('flagged');
+    });
+    
+    grid.appendChild(cell);
+  }
+}
+
+function getNeighborMines(index,mines){
+  const row=Math.floor(index/8);
+  const col=index%8;
+  let count=0;
+  
+  for(let r=row-1;r<=row+1;r++){
+    for(let c=col-1;c<=col+1;c++){
+      if(r>=0&&r<8&&c>=0&&c<8){
+        const neighborIndex=r*8+c;
+        if(mines.includes(neighborIndex))count++;
+      }
+    }
+  }
+  
+  return count;
+}
+
+// Paramètres
+function openSettings(){
+  document.getElementById('settings-window').style.display='block';
+  addTaskbarItem('settings','⚙️','Paramètres');
+}
+
+// Barre des tâches
+function addTaskbarItem(id,icon,text){
+  if(openWindows.has(id))return;
+  openWindows.add(id);
+  
+  const tp=document.getElementById('taskbar-programs');
+  const it=document.createElement('div');
+  it.id='taskbar-'+id;
+  it.className='taskbar-item active';
+  it.innerHTML=`<span class="taskbar-item-icon">${icon}</span><span class="taskbar-item-text">${text}</span>`;
+  tp.appendChild(it);
+}
+
+function removeTaskbarItem(id){
+  openWindows.delete(id);
+  const ti=document.getElementById('taskbar-'+id);
+  if(ti)ti.remove();
+}
+
+// Menu démarrer
+document.getElementById('start-btn').addEventListener('click',()=>{
+  const menu=document.getElementById('start-menu');
+  menu.style.display=menu.style.display==='none'||!menu.style.display?'block':'none';
+});
+
+document.addEventListener('click',e=>{
+  const menu=document.getElementById('start-menu');
+  const startBtn=document.getElementById('start-btn');
+  if(!menu.contains(e.target)&&!startBtn.contains(e.target)){
+    menu.style.display='none';
+  }
+});
+
+document.querySelectorAll('.start-menu-item').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const app=item.dataset.app;
+    document.getElementById('start-menu').style.display='none';
+    
+    if(app==='doc')openDocApp();
+    else if(app==='email')openEmail();
+    else if(app==='explorer')openExplorer('documents');
+    else if(app==='calendar')openCalendar();
+    else if(app==='minesweeper')openMinesweeper();
+    else if(app==='settings')openSettings();
+  });
+});
+
+document.querySelectorAll('.start-menu-shortcut').forEach(item=>{
+  item.addEventListener('click',()=>{
+    const path=item.dataset.path;
+    document.getElementById('start-menu').style.display='none';
+    openExplorer(path);
+  });
+});
+
+// Boutons shutdown
+document.getElementById('logoff-btn').addEventListener('click',()=>{
+  location.reload();
+});
+
+document.getElementById('shutdown-btn').addEventListener('click',()=>{
+  document.body.innerHTML='<div style="position:fixed;inset:0;background:#000;display:flex;align-items:center;justify-content:center;color:#fff;font-size:24px;font-family:Tahoma;">Il est maintenant possible d\'éteindre l\'ordinateur en toute sécurité.</div>';
+});
+
+// Volume
+document.getElementById('volume-icon').addEventListener('click',()=>{
+  const popup=document.getElementById('volume-popup');
+  popup.style.display=popup.style.display==='none'||!popup.style.display?'flex':'none';
+});
+
+document.getElementById('volume-slider').addEventListener('input',e=>{
+  volumeLevel=e.target.value;
+  e.target.nextElementSibling.textContent=volumeLevel+'%';
+});
+
+document.getElementById('main-volume-slider').addEventListener('input',e=>{
+  volumeLevel=e.target.value;
+  document.getElementById('volume-display').textContent=volumeLevel+'%';
+});
+
+// Horloge cliquable
+document.getElementById('clock').addEventListener('click',()=>openCalendar());
+
+// Bureau
+document.getElementById('computer-icon').addEventListener('click',()=>openExplorer('computer'));
+document.getElementById('doc-icon').addEventListener('click',openDocApp);
+document.getElementById('documents-icon').addEventListener('click',()=>openExplorer('documents'));
+document.getElementById('email-icon').addEventListener('click',openEmail);
+
+// Explorateur
+document.getElementById('explorer-close-btn').addEventListener('click',()=>{
+  document.getElementById('explorer-window').style.display='none';
+  removeTaskbarItem('explorer');
+});
+
+document.getElementById('back-btn').addEventListener('click',()=>{
+  if(pathHistory.length>1){
+    pathHistory.pop();
+    const prevPath=pathHistory[pathHistory.length-1];
+    pathHistory.pop();
+    openExplorer(prevPath);
+  }
+});
+
+document.getElementById('up-btn').addEventListener('click',()=>{
+  const parts=currentPath.split('/');
+  if(parts.length>1){
+    parts.pop();
+    openExplorer(parts.join('/')||'documents');
+  }
+});
+
+document.getElementById('refresh-btn').addEventListener('click',()=>{
+  const temp=currentPath;
+  pathHistory.pop();
+  openExplorer(temp);
+});
+
+document.querySelectorAll('.sidebar-item').forEach(item=>{
+  item.addEventListener('click',function(){
+    const path=this.dataset.path;
+    if(path)openExplorer(path);
+  });
+});
+
+// Bloc-notes
+document.getElementById('notepad-close-btn').addEventListener('click',()=>{
+  document.getElementById('notepad-window').style.display='none';
+  removeTaskbarItem('notepad');
+});
+
+// Démineur
+document.getElementById('minesweeper-close-btn').addEventListener('click',()=>{
+  document.getElementById('minesweeper-window').style.display='none';
+  removeTaskbarItem('minesweeper');
+  if(gameInterval)clearInterval(gameInterval);
+});
+
+document.getElementById('new-game-btn').addEventListener('click',initMinesweeper);
+
+// Email
+document.getElementById('email-close-btn').addEventListener('click',()=>{
+  document.getElementById('email-window').style.display='none';
+  removeTaskbarItem('email');
+});
+
+document.querySelectorAll('.email-folder').forEach(folder=>{
+  folder.addEventListener('click',function(){
+    loadEmails(this.dataset.folder);
+  });
+});
+
+// Calendrier
+document.getElementById('calendar-close-btn').addEventListener('click',()=>{
+  document.getElementById('calendar-window').style.display='none';
+  removeTaskbarItem('calendar');
+});
+
+document.getElementById('prev-month-btn').addEventListener('click',()=>{
+  currentMonth--;
+  if(currentMonth<0){
+    currentMonth=11;
+    currentYear--;
+  }
+  renderCalendar();
+});
+
+document.getElementById('next-month-btn').addEventListener('click',()=>{
+  currentMonth++;
+  if(currentMonth>11){
+    currentMonth=0;
+    currentYear++;
+  }
+  renderCalendar();
+});
+
+// Paramètres
+document.getElementById('settings-close-btn').addEventListener('click',()=>{
+  document.getElementById('settings-window').style.display='none';
+  removeTaskbarItem('settings');
+});
+
+// D.O.C. Application
+document.getElementById('close-btn').addEventListener('click',()=>{
+  document.getElementById('main-window').style.display='none';
+  removeTaskbarItem('doc');
+  v='login';
+  u=null;
+  r='none';
+  document.getElementById('email').value='';
+  document.getElementById('password').value='';
+});
+
+function ren(){
+  document.getElementById('login-view').style.display='none';
+  document.getElementById('main-view').style.display='none';
+  document.getElementById('detail-view').style.display='none';
+  document.getElementById('form-view').style.display='none';
+  const badge=document.getElementById('user-role-badge');
+  if(badge&&r!=='none'){
+    badge.textContent=r==='admin'?'ADMIN':'USER';
+    badge.className=r==='admin'?'user-badge admin-badge':'user-badge';
+  }
+  if(v==='login')document.getElementById('login-view').style.display='flex';
+  else if(v==='list'){
+    document.getElementById('main-view').style.display='block';
+    const b=document.getElementById('add-inmate-btn');
+    if(b)b.style.display=r==='admin'?'inline-block':'none';
+    lst(document.getElementById('search-input').value);
+  }else if(v==='detail'){
+    document.getElementById('detail-view').style.display='block';
+    det(ci);
+  }else if(v==='form'){
+    document.getElementById('form-view').style.display='block';
+    frm(ci);
+  }
+}
+
+function lst(f=''){
+  const l=document.getElementById('inmates-list');
+  l.innerHTML='';
+  const t=f.toLowerCase();
+  const fi=inmates.filter(i=>i.name.toLowerCase().includes(t)||(i.alias&&i.alias.toLowerCase().includes(t))||(i.crimeDetails&&i.crimeDetails.toLowerCase().includes(t))||i.cell.toLowerCase().includes(t)||i.block.toLowerCase().includes(t));
+  document.getElementById('no-results').classList.toggle('hidden',fi.length>0);
+  fi.forEach(im=>{
+    const c=document.createElement('div');
+    c.className='inmate-card';
+    c.innerHTML='<div class="inmate-card-header"><div class="inmate-avatar">👤</div><div class="inmate-info"><div class="inmate-name">'+im.name+'</div><div class="inmate-alias">'+(im.alias?'"'+im.alias+'"':'Aucun alias')+'</div></div></div><div class="inmate-meta"><span class="inmate-meta-item meta-block">Bloc '+im.block+'</span><span class="inmate-meta-item meta-cell">Cellule '+im.cell+'</span><span class="inmate-meta-item meta-sentence '+(im.isLifeSentence?'sentence-life':'')+'">'+(im.isLifeSentence?'Perpétuité':(im.sentenceDuration||'N/A'))+'</span></div>';
+    c.addEventListener('click',()=>shw('detail',im.id));
+    l.appendChild(c);
+  });
+}
+
+function det(id){
+  const im=inmates.find(i=>i.id===id);
+  if(!im){shw('list');return;}
+  document.getElementById('detail-name').textContent=im.name;
+  document.getElementById('detail-alias').textContent=im.alias?'Alias: "'+im.alias+'"':'Aucun alias connu';
+  document.getElementById('detail-age').textContent=im.age+' ans';
+  document.getElementById('detail-block').textContent='Bloc '+im.block;
+  document.getElementById('detail-cell').textContent=im.cell;
+  document.getElementById('detail-sentence').textContent=im.isLifeSentence?'Perpétuité':(im.sentenceDuration||'N/A');
+  document.getElementById('detail-sentence').className='detail-grid-value'+(im.isLifeSentence?' sentence-life':'');
+  document.getElementById('detail-start-date').textContent=im.startDate?new Date(im.startDate).toLocaleDateString('fr-FR'):'N/A';
+  document.getElementById('detail-end-date').textContent=im.isLifeSentence?'Jamais':(im.endDate?new Date(im.endDate).toLocaleDateString('fr-FR'):'N/A');
+  document.getElementById('detail-crime').textContent=im.crimeDetails||'Non spécifié.';
+  document.getElementById('detail-backstory').textContent=im.backstory||'Non spécifié.';
+  document.getElementById('detail-family').textContent=im.family||'Non spécifié.';
+  ['detail-crime','detail-backstory','detail-family'].forEach(id=>{
+    const el=document.getElementById(id);
+    if(r==='user')el.classList.add('blurred');
+    else el.classList.remove('blurred');
+  });
+  const hn=im.adminNotes&&im.adminNotes.trim()!=='';
+  if(r==='admin'){
+    document.getElementById('detail-admin-buttons').classList.remove('hidden');
+    document.getElementById('detail-admin-notes-section').classList.toggle('hidden',!hn);
+    document.getElementById('detail-admin-notes').textContent=hn?im.adminNotes:'';
+  }else{
+    document.getElementById('detail-admin-buttons').classList.add('hidden');
+    document.getElementById('detail-admin-notes-section').classList.add('hidden');
+  }
+}
+
+function frm(id=null){
+  document.getElementById('inmate-form').reset();
+  document.getElementById('inmate-id').value='';
+  document.getElementById('form-error').classList.add('hidden');
+  document.getElementById('form-success').classList.add('hidden');
+  document.getElementById('form-admin-notes-section').classList.toggle('hidden',r!=='admin');
+  if(id){
+    const im=inmates.find(i=>i.id===id);
+    if(!im)return;
+    document.getElementById('inmate-id').value=im.id;
+    document.getElementById('name').value=im.name||'';
+    document.getElementById('alias').value=im.alias||'';
+    document.getElementById('age').value=im.age||'';
+    document.getElementById('block').value=im.block||'';
+    document.getElementById('cell').value=im.cell||'';
+    document.getElementById('sentenceDuration').value=im.sentenceDuration||'';
+    document.getElementById('startDate').value=im.startDate||'';
+    document.getElementById('endDate').value=im.endDate||'';
+    document.getElementById('isLifeSentence').checked=im.isLifeSentence||false;
+    document.getElementById('crimeDetails').value=im.crimeDetails||'';
+    document.getElementById('backstory').value=im.backstory||'';
+    document.getElementById('family').value=im.family||'';
+    document.getElementById('adminNotes').value=im.adminNotes||'';
+  }
+  tog();
+}
+
+function shw(vn,id=null){ci=id;v=vn;ren();}
+
+function tog(){
+  const l=document.getElementById('isLifeSentence').checked;
+  document.getElementById('endDate').disabled=l;
+  if(l)document.getElementById('endDate').value='';
+}
+
+// Événements de connexion
+document.getElementById('login-btn').addEventListener('click',()=>{
+  const e=document.getElementById('email').value.trim().toLowerCase();
+  const p=document.getElementById('password').value.trim().toLowerCase();
+  const le=document.getElementById('login-error');
+  if(e==='admin'&&p==='admin'){
+    u={email:e};r='admin';v='list';le.style.display='none';
+    document.getElementById('start-menu-user-name').textContent='Administrateur';
+    showNotification('✅','Connexion réussie','Bienvenue Administrateur');
+    setTimeout(()=>ren(),300);
+  }else if(e==='user'&&p==='user'){
+    u={email:e};r='user';v='list';le.style.display='none';
+    document.getElementById('start-menu-user-name').textContent='Utilisateur';
+    showNotification('✅','Connexion réussie','Bienvenue Utilisateur');
+    setTimeout(()=>ren(),300);
+  }else{
+    le.textContent="⚠️ Identifiant ou mot de passe incorrect.";
+    le.style.display='block';
+  }
+});
+
+document.getElementById('email').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('login-btn').click();});
+document.getElementById('password').addEventListener('keypress',e=>{if(e.key==='Enter')document.getElementById('login-btn').click();});
+
+const ab=document.getElementById('add-inmate-btn');
+if(ab)ab.addEventListener('click',()=>shw('form'));
+
+const bb=document.getElementById('back-to-list-btn');
+if(bb)bb.addEventListener('click',()=>shw('list'));
+
+const bf=document.getElementById('back-from-form-btn');
+if(bf)bf.addEventListener('click',()=>{const id=document.getElementById('inmate-id').value;shw(id?'detail':'list',id||null);});
+
+const si=document.getElementById('search-input');
+if(si)si.addEventListener('input',e=>lst(e.target.value));
+
+const f=document.getElementById('inmate-form');
+if(f)f.addEventListener('submit',e=>{
+  e.preventDefault();
+  if(r!=='admin')return;
+  document.getElementById('form-error').classList.add('hidden');
+  document.getElementById('form-success').classList.add('hidden');
+  const d={name:document.getElementById('name').value.trim(),alias:document.getElementById('alias').value.trim(),age:parseInt(document.getElementById('age').value,10),block:document.getElementById('block').value.trim().toUpperCase(),cell:document.getElementById('cell').value.trim(),sentenceDuration:document.getElementById('sentenceDuration').value.trim(),startDate:document.getElementById('startDate').value,endDate:document.getElementById('endDate').value,isLifeSentence:document.getElementById('isLifeSentence').checked,crimeDetails:document.getElementById('crimeDetails').value.trim(),backstory:document.getElementById('backstory').value.trim(),family:document.getElementById('family').value.trim(),adminNotes:document.getElementById('adminNotes').value.trim()};
+  if(!d.name||!d.age||!d.block||!d.cell){
+    document.getElementById('form-error').textContent="Les champs Nom, Âge, Bloc et Cellule sont obligatoires.";
+    document.getElementById('form-error').classList.remove('hidden');
+    return;
+  }
+  const id=document.getElementById('inmate-id').value;
+  if(id){
+    const ix=inmates.findIndex(i=>i.id===id);
+    if(ix!==-1)inmates[ix]={...inmates[ix],...d};
+    document.getElementById('form-success').textContent="✓ Dossier modifié avec succès !";
+  }else{
+    d.id=Date.now().toString();
+    inmates.push(d);
+    document.getElementById('form-success').textContent="✓ Détenu ajouté avec succès !";
+  }
+  document.getElementById('form-success').classList.remove('hidden');
+  inmates.sort((a,b)=>a.name.localeCompare(b.name));
+  setTimeout(()=>shw('list'),1500);
+});
+
+const cf=document.getElementById('cancel-form-btn');
+if(cf)cf.addEventListener('click',()=>{const id=document.getElementById('inmate-id').value;shw(id?'detail':'list',id||null);});
+
+const ls=document.getElementById('isLifeSentence');
+if(ls)ls.addEventListener('change',tog);
+
+const eb=document.getElementById('edit-inmate-btn');
+if(eb)eb.addEventListener('click',()=>shw('form',ci));
+
+const db=document.getElementById('delete-inmate-btn');
+if(db)db.addEventListener('click',()=>{if(r!=='admin'||!ci)return;dt=ci;document.getElementById('delete-modal').style.display='flex';});
+
+const cd=document.getElementById('confirm-delete-btn');
+if(cd)cd.addEventListener('click',()=>{if(dt){inmates=inmates.filter(i=>i.id!==dt);dt=null;document.getElementById('delete-modal').style.display='none';shw('list');}});
+
+const ca=document.getElementById('cancel-delete-btn');
+if(ca)ca.addEventListener('click',()=>{dt=null;document.getElementById('delete-modal').style.display='none';});
+
+window.addEventListener('load',bios);
+</script>
+</body>
+</html>
